@@ -55,36 +55,37 @@ st.markdown("""
 
 /* 메시지 스타일 수정 */
 .chat-message {
-    padding: 1.2rem;  /* 패딩 축소 */
+    padding: 0.8rem;  /* 패딩 더 축소 */
     border-radius: 0.5rem;
-    margin-bottom: 0.8rem;  /* 마진 축소 */
+    margin-bottom: 0.5rem;  /* 마진 더 축소 */
     white-space: pre-wrap;
 }
 
-/* 섹션 간격 조정 */
+/* 섹션 간격 더 축소 */
 .chat-message h1, 
 .chat-message h2, 
 .chat-message h3 {
-    margin-top: 1rem;      /* 제목 위 여백 */
-    margin-bottom: 0.5rem; /* 제목 아래 여백 */
+    margin-top: 0.7rem;     /* 제목 위 여백 축소 */
+    margin-bottom: 0.3rem;  /* 제목 아래 여백 축소 */
 }
 
-/* 문단 간격 조정 */
+/* 문단 간격 최소화 */
 .chat-message p {
-    margin-bottom: 0.5rem;  /* 문단 사이 여백 */
-    line-height: 1.4;       /* 줄 간격 축소 */
+    margin-bottom: 0.3rem;  /* 문단 사이 여백 축소 */
+    line-height: 1.3;       /* 줄 간격 더 축소 */
 }
 
-/* 목록 간격 조정 */
+/* 목록 간격 최소화 */
 .chat-message ul, 
 .chat-message ol {
-    margin-top: 0.3rem;
-    margin-bottom: 0.3rem;
-    padding-left: 1.2rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+    padding-left: 1rem;
 }
 
 .chat-message li {
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.1rem;  /* 목록 아이템 간격 최소화 */
+    line-height: 1.3;       /* 목록 줄 간격 축소 */
 }
 
 .user-message {
@@ -110,9 +111,10 @@ st.markdown("""
 
 /* 출처 정보 스타일 */
 .source-info {
-    margin-top: 0.8rem;
-    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    padding-top: 0.3rem;
     font-size: 0.8em;
+    border-top: 1px solid #eee;
 }
 </style>
 """, unsafe_allow_html=True)
