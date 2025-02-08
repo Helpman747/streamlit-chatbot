@@ -9,131 +9,52 @@ st.set_page_config(
     layout="wide"
 )
 
-# 스타일 추가
+# 스타일 수정
 st.markdown("""
 <style>
     /* 전체 컨테이너 */
     .main .block-container {
         padding-top: 2rem;
-        max-width: 800px;  /* 전체 너비 800px로 축소 */
-        margin: 0 auto;    /* 중앙 정렬 */
-        background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
     }
 
-    /* 메시지 컨테이너 스타일 */
-    .stTextInput {
-        border-radius: 15px;
-    }
-    
     /* 채팅 메시지 스타일 */
     .chat-message {
-        padding: 1.5rem;
-        border-radius: 0.8rem;
-        margin-bottom: 1.5rem;
-        line-height: 1.8;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
+        padding: 1.5rem 2rem;
+        border-radius: 0;
+        margin-bottom: 0;
+        line-height: 1.6;
         word-wrap: break-word;
         white-space: pre-wrap;
-        max-width: 85%;    /* 메시지 너비를 85%로 제한 */
-        margin: 0 auto 1.5rem auto;  /* 상하 여백 조정 */
-    }
-    .chat-message:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 800px;
+        border-bottom: 1px solid #f0f0f0;
     }
 
     /* 사용자 메시지 */
     .user-message {
-        background: linear-gradient(135deg, #e8f0fe, #ffffff);
-        margin-left: auto;  /* 오른쪽 정렬 */
-        margin-right: 2rem; /* 오른쪽 여백 */
+        background: #f7f7f8;
     }
 
     /* AI 메시지 */
     .ai-message {
-        background: linear-gradient(135deg, #ffffff, #f8f9fa);
-        margin-right: auto; /* 왼쪽 정렬 */
-        margin-left: 2rem;  /* 왼쪽 여백 */
-        font-size: 1.1rem;
-    }
-
-    /* 제목 스타일 */
-    .main-title {
-        text-align: center;
-        background: linear-gradient(45deg, #1a73e8, #4285f4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        background: white;
     }
 
     /* 입력창 스타일 */
     .stChatInput {
-        margin-top: 1rem;
+        max-width: 800px;
+        margin: 0 auto;
         padding: 1rem;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        border: 2px solid #e8f0fe;
-        transition: all 0.3s ease;
-    }
-    .stChatInput:focus {
-        border-color: #1a73e8;
-        box-shadow: 0 4px 15px rgba(26,115,232,0.2);
+        border-radius: 0;
     }
 
     /* 사이드바 스타일 */
     .css-1d391kg {
-        background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+        background: white;
         padding: 2rem 1rem;
-    }
-
-    /* 버튼 스타일 */
-    .stButton>button {
-        background: linear-gradient(45deg, #1a73e8, #4285f4);
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-    .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(26,115,232,0.3);
-    }
-
-    /* 선택 박스 스타일 */
-    .stSelectbox {
-        border-radius: 8px;
-        border: 2px solid #e8f0fe;
-    }
-    .stSelectbox:hover {
-        border-color: #1a73e8;
-    }
-
-    /* 강조 텍스트 */
-    .highlight {
-        background: linear-gradient(120deg, #e8f0fe 0%, #e8f0fe 100%);
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        font-weight: 500;
-    }
-
-    /* 섹션 제목 */
-    .section-title {
-        color: #1a73e8;
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin: 1.5rem 0 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e8f0fe;
-        background: linear-gradient(to right, #1a73e8, #4285f4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
     }
 </style>
 """, unsafe_allow_html=True)
