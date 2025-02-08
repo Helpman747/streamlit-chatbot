@@ -5,6 +5,9 @@ from googleapiclient.errors import HttpError
 import os
 import json  # 디버깅용 추가
 
+# app.py 맨 위에 추가
+print("Available secrets:", st.secrets)
+
 # 페이지 기본 설정
 st.set_page_config(
     page_title="25th 3rd 수니콘미션 챗GPT",
@@ -71,20 +74,21 @@ h1 {
 
 /* 메시지 스타일 */
 .chat-message {
-    padding: 1.5rem 2rem;
-    line-height: 1.6;
-    border-bottom: 1px solid #e5e5e5;
-    margin: 0;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    white-space: pre-wrap;
 }
 
 /* 사용자 메시지 */
 .user-message {
-    background: #f7f7f8;
+    background-color: #f0f2f6;
 }
 
 /* AI 메시지 */
 .assistant-message {
-    background: white;
+    background-color: white;
+    border: 1px solid #e0e0e0;
 }
 
 /* 입력창 영역 */
@@ -129,6 +133,22 @@ h1 {
 ::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+
+.source-info {
+    font-size: 0.8em;
+    color: #666;
+    border-top: 1px solid #eee;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+}
+
+.search-results {
+    font-size: 0.9em;
+    background-color: #f8f9fa;
+    border-left: 3px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem 0;
+}
 </style>
 
 <!-- 헤더 배너 추가 -->
@@ -140,7 +160,7 @@ h1 {
 """, unsafe_allow_html=True)
 
 # OpenAI 클라이언트 초기화
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+client = OpenAI(api_key=st.secrets["openai_api_key"])
 
 # 제목 제거 (이미 컨테이너 안에 포함될 것이므로)
 # st.markdown('<h1 class="main-title">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
@@ -153,6 +173,8 @@ SYSTEM_PROMPT = """당신은 친근하고 전문적인 AI 어시스턴트입니�
    - 전문 용어는 쉽게 풀어서 설명
    - 중요한 내용은 **강조**하여 표시
    - 필요한 경우 이모지 활용
+   - 좀더 전문가적 문서처럼 보이게 답변
+   - 최신정보도 포함해서 답변
 
 2. 답변 구조
    - 핵심 내용을 먼저 간단히 요약
@@ -181,15 +203,16 @@ SYSTEM_PROMPT = """당신은 친근하고 전문적인 AI 어시스턴트입니�
 # Google API 연결 테스트
 def test_google_api():
     try:
-        service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
+        service = build("customsearch", "v1", developerKey=st.secrets["google_api_key"])
         test_result = service.cse().list(
             q="test",
-            cx=st.secrets["GOOGLE_CSE_ID"],
+            cx=st.secrets["google_cse_id"],
             num=1
         ).execute()
-        return "Google API 연결 성공"
+        return True
     except Exception as e:
-        return f"Google API 연결 실패: {str(e)}"
+        print(f"Google API 연결 실패: {str(e)}")
+        return False
 
 # 시작할 때 API 테스트 실행
 print(test_google_api())
@@ -198,18 +221,16 @@ print(test_google_api())
 def google_search(query, num_results=5):
     try:
         print(f"검색 시작: {query}")
-        print(f"API 키: {st.secrets['GOOGLE_API_KEY'][:10]}...")
-        print(f"검색 엔진 ID: {st.secrets['GOOGLE_CSE_ID']}")
+        print(f"API 키: {st.secrets['google_api_key'][:10]}...")
+        print(f"검색 엔진 ID: {st.secrets['google_cse_id']}")
+        print(f"전체 secrets: {st.secrets}")  # 디버깅용 추가
         
-        # 검색어 처리
-        search_query = query  # 사이트 제한 없이 먼저 테스트
-        
-        service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
+        service = build("customsearch", "v1", developerKey=st.secrets["google_api_key"])
         
         try:
             result = service.cse().list(
-                q=search_query,
-                cx=st.secrets["GOOGLE_CSE_ID"],
+                q=query,
+                cx=st.secrets["google_cse_id"],
                 num=num_results,
                 lr='lang_ko',
                 gl='kr'
@@ -286,10 +307,38 @@ st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 # 메시지 영역 시작
 st.markdown('<div class="messages-container">', unsafe_allow_html=True)
 
-# 메시지 표시
+# 메시지 표시 함수 추가
+def format_message(content, role):
+    if "제목:" in content and "내용:" in content and "출처:" in content:
+        # 검색 결과를 포함한 메시지 포맷팅
+        parts = content.split("\n\n")
+        search_results = []
+        sources = []
+        
+        for part in parts:
+            if part.startswith("제목:"):
+                lines = part.split("\n")
+                title = lines[0].replace("제목: ", "")
+                snippet = lines[1].replace("내용: ", "")
+                source = lines[2].replace("출처: ", "")
+                
+                search_results.append(f"**{title}**\n{snippet}")
+                sources.append(f"- [{title}]({source})")
+        
+        formatted_content = "\n\n".join(search_results)
+        sources_section = "\n".join(sources)
+        
+        return f"""<div class="{role}-message chat-message">
+{formatted_content}
+<div class="source-info">출처:\n{sources_section}</div>
+</div>"""
+    else:
+        return f'<div class="{role}-message chat-message">{content}</div>'
+
+# 메시지 표시 부분 수정
 for message in st.session_state.messages:
     st.markdown(
-        f'<div class="{message["role"]}-message chat-message">{message["content"]}</div>',
+        format_message(message["content"], message["role"]),
         unsafe_allow_html=True
     )
 
@@ -339,7 +388,7 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
         if chunk.choices[0].delta.content is not None:
             response += chunk.choices[0].delta.content
             message_placeholder.markdown(
-                f'<div class="assistant-message chat-message">{response}</div>',
+                format_message(response, "assistant"),
                 unsafe_allow_html=True
             )
 
