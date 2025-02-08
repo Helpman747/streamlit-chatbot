@@ -1,6 +1,7 @@
 ﻿import streamlit as st
 from openai import OpenAI
 from googleapiclient.discovery import build
+import os
 
 # 페이지 기본 설정
 st.set_page_config(
@@ -9,9 +10,101 @@ st.set_page_config(
     layout="centered"
 )
 
-# CSS 파일 로드
-with open('static/style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+# CSS 스타일 직접 포함
+st.markdown("""
+<style>
+/* 전체 페이지 배경 */
+.stApp {
+    background: #f7f7f8;
+}
+
+/* 전체 컨테이너 */
+.main .block-container {
+    max-width: 800px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: white;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* 제목 */
+h1 {
+    font-size: 1.5rem !important;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e5e5;
+    margin: 0 !important;
+}
+
+/* 메시지 영역 */
+.messages-container {
+    padding: 0;
+    margin-bottom: 100px;  /* 입력창 높이만큼 여백 */
+}
+
+/* 메시지 스타일 */
+.chat-message {
+    padding: 1.5rem 2rem;
+    line-height: 1.6;
+    border-bottom: 1px solid #e5e5e5;
+    margin: 0;
+}
+
+/* 사용자 메시지 */
+.user-message {
+    background: #f7f7f8;
+}
+
+/* AI 메시지 */
+.assistant-message {
+    background: white;
+}
+
+/* 입력창 영역 */
+.input-area {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    background: white;
+    border-top: 1px solid #e5e5e5;
+    padding: 1.5rem;
+}
+
+/* 입력창 스타일 */
+.stChatInput {
+    max-width: 768px !important;  /* 여백 고려 */
+    margin: 0 auto !important;
+}
+
+/* 사이드바 */
+.css-1d391kg {
+    background: white;
+    padding: 1rem;
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # OpenAI 클라이언트 초기화
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
