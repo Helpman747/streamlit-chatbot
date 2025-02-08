@@ -270,7 +270,7 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
     future_date_response = handle_future_date_query(prompt)
     if future_date_response:
         st.session_state.messages.append({"role": "assistant", "content": future_date_response})
-        st.rerun()  # 앱을 다시 실행하여 메시지를 표시
+        st.experimental_rerun()  # st.rerun() 대신 st.experimental_rerun() 사용
     else:
         st.session_state.messages.append({"role": "user", "content": prompt})
         
