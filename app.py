@@ -197,14 +197,26 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
             "content": f"다음은 이 질문에 대한 최신 검색 결과입니다. 이를 참고하여 최신 정보를 포함해 답변해주세요:\n\n{search_results}"
         })
 
-    stream = client.chat.completions.create(
+    # 응답 생성
+    response = ""
+    for chunk in client.chat.completions.create(
         model=model_name,
         messages=messages,
         stream=True,
-    )
-    response = st.write_stream(stream)
+    ):
+        if chunk.choices[0].delta.content is not None:
+            response += chunk.choices[0].delta.content
+            # 메시지 영역 내에서 실시간 업데이트
+            messages_html = ""
+            for msg in st.session_state.messages:
+                messages_html += f'<div class="{msg["role"]}-message chat-message">{msg["content"]}</div>'
+            if response:
+                messages_html += f'<div class="assistant-message chat-message">{response}</div>'
+            placeholder = st.empty()
+            placeholder.markdown(f'<div class="messages-container">{messages_html}</div>', unsafe_allow_html=True)
+
     st.session_state.messages.append({"role": "assistant", "content": response})
-    st.experimental_rerun()  # 새로운 메시지를 표시하기 위해 페이지 새로고침
+    st.experimental_rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
 
