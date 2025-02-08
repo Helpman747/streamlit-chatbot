@@ -9,159 +9,36 @@ import re
 # app.py 맨 위에 추가
 print("Available secrets:", st.secrets)
 
-# 페이지 기본 설정
+# 페이지 설정
 st.set_page_config(
-    page_title="25th 3rd 수니콘미션 챗GPT",
+    page_title="25th 3rd Soonicon ChatGPT",
     page_icon="🤖",
-    layout="centered"
+    layout="wide"
 )
 
-# CSS 스타일 직접 포함
+# CSS 스타일 추가
 st.markdown("""
 <style>
-/* 헤더 스타일 */
-.header-banner {
-    width: 100%;
-    background: #1a1a1a;
-    padding: 1rem 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+/* 헤더 배너 스타일 */
+.stApp > header {
+    background-color: transparent !important;
 }
 
-.header-content {
-    max-width: 800px;
+.banner-image {
+    width: 850px;
     margin: 0 auto;
-    text-align: center;
-}
-
-.header-image {
-    max-width: 800px;  /* 컨테이너 너비에 맞춤 */
-    width: 100%;
-    height: auto;
     display: block;
 }
 
-/* 전체 페이지 배경 */
-.stApp {
-    background: #f7f7f8;
-}
-
-/* 전체 컨테이너 */
-.main .block-container {
-    max-width: 800px !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    background: white;
-    min-height: 100vh;
-    border-radius: 0;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    padding-top: 0 !important;  /* 헤더 아래 패딩 제거 */
-}
-
-/* 제목 */
-h1 {
-    font-size: 1.5rem !important;
-    padding: 1rem;
-    border-bottom: 1px solid #e5e5e5;
-    margin: 0 !important;
-}
-
-/* 메시지 영역 */
-.messages-container {
-    padding: 0;
-    margin-bottom: 100px;  /* 입력창 높이만큼 여백 */
-}
-
-/* 메시지 스타일 */
-.chat-message {
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-    white-space: pre-wrap;
-}
-
-/* 사용자 메시지 */
-.user-message {
-    background-color: #f0f2f6;
-}
-
-/* AI 메시지 */
-.assistant-message {
-    background-color: white;
-    border: 1px solid #e0e0e0;
-}
-
-/* 입력창 영역 */
-.input-area {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 800px;
-    background: white;
-    border-top: 1px solid #e5e5e5;
-    padding: 1.5rem;
-}
-
-/* 입력창 스타일 */
-.stChatInput {
-    max-width: 768px !important;  /* 여백 고려 */
-    margin: 0 auto !important;
-}
-
-/* 사이드바 */
-.css-1d391kg {
-    background: white;
-    padding: 1rem;
-}
-
-/* 스크롤바 스타일 */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-.source-info {
-    font-size: 0.8em;
-    color: #666;
-    border-top: 1px solid #eee;
-    margin-top: 1rem;
-    padding-top: 0.5rem;
-}
-
-.search-results {
-    font-size: 0.9em;
-    background-color: #f8f9fa;
-    border-left: 3px solid #dee2e6;
-    padding: 0.5rem 1rem;
-    margin: 0.5rem 0;
+/* 사이드바 로고 제거 */
+.sidebar .sidebar-content {
+    background-image: none !important;
 }
 </style>
-
-<!-- 헤더 배너 추가 -->
-<div class="header-banner">
-    <div class="header-content">
-        <img src="배너이미지주소" alt="25th 3rd 수니콘미션" class="header-image">
-    </div>
-</div>
 """, unsafe_allow_html=True)
 
-# 배너 이미지 추가
-st.image("images/banner.png", width=850)
+# 헤더 배너 추가
+st.markdown(f'<img src="https://baegna.com/img/3rd.png" class="banner-image">', unsafe_allow_html=True)
 
 # OpenAI 클라이언트 초기화
 client = OpenAI(api_key=st.secrets["openai_api_key"])
@@ -271,9 +148,6 @@ def google_search(query, num_results=5):
 
 # 사이드바 설정
 with st.sidebar:
-    # 배너 이미지 추가 (검정색 부분 제거된 이미지 사용)
-    st.image("https://baegna.com/img/3rd.png", width=850)
-    
     st.markdown("### ⚙️ 모델 설정")
     model = st.selectbox(
         "모델 선택",
