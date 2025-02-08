@@ -5,7 +5,7 @@ from googleapiclient.discovery import build
 # 페이지 기본 설정
 st.set_page_config(
     page_title="25th 3rd 수니콘미션 챗GPT",
-    page_icon="��",
+    page_icon="🤖",
     layout="wide"
 )
 
@@ -17,36 +17,19 @@ st.markdown("""
         background: #f0f2f5;
     }
 
-    /* 중앙 컨테이너 */
+    /* 메인 컨테이너 */
     .main .block-container {
-        max-width: 100%;
-        padding: 0;
-    }
-
-    /* 채팅 컨테이너 */
-    .chat-container {
         max-width: 800px;
         margin: 0 auto;
+        padding: 2rem;
         background: white;
-        min-height: calc(100vh - 100px);
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        display: flex;
-        flex-direction: column;
+        min-height: 100vh;
     }
 
-    /* 메시지 영역 */
-    .messages-container {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 2rem 0;
-    }
-
-    /* 채팅 메시지 스타일 */
+    /* 메시지 스타일 */
     .chat-message {
         padding: 1.5rem 2rem;
         line-height: 1.6;
-        width: 100%;
         border-bottom: 1px solid #f0f0f0;
     }
 
@@ -60,28 +43,10 @@ st.markdown("""
         background: white;
     }
 
-    /* 입력창 영역 */
-    .input-area {
-        position: sticky;
-        bottom: 0;
-        background: white;
-        padding: 1rem;
-        border-top: 1px solid #f0f0f0;
-        width: 800px;
-        margin: 0 auto;
-    }
-
     /* 입력창 스타일 */
     .stChatInput {
         max-width: 800px !important;
         margin: 0 auto;
-    }
-
-    /* Streamlit 기본 요소 숨기기 */
-    .stTextInput, .stMarkdown {
-        position: static;
-        margin: 0;
-        padding: 0;
     }
 
     /* 사이드바 스타일 */
