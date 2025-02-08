@@ -1,6 +1,5 @@
 import streamlit as st
 from openai import OpenAI
-from duckduckgo_search import ddg
 
 # 페이지 기본 설정
 st.set_page_config(
@@ -109,20 +108,6 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 # 제목
 st.markdown('<h1 class="main-title">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
 
-# 웹 검색 함수 추가
-def search_web(query, num_results=3):
-    try:
-        results = ddg(query, max_results=num_results)
-        if results:
-            search_results = "\n\n".join([
-                f"출처: {r['link']}\n{r['title']}\n{r['body']}"
-                for r in results
-            ])
-            return f"\n\n관련 웹 검색 결과:\n\n{search_results}"
-        return ""
-    except Exception as e:
-        return ""
-
 # 시스템 프롬프트 수정
 SYSTEM_PROMPT = """당신은 전문적인 AI 어시스턴트입니다. 답변할 때:
 
@@ -137,13 +122,7 @@ SYSTEM_PROMPT = """당신은 전문적인 AI 어시스턴트입니다. 답변할
    - 적절한 여백 유지
    - 표나 코드는 마크다운 형식으로 정리
 
-3. 정보 제공:
-   - 가능한 최신 정보 포함
-   - 신뢰할 수 있는 출처 인용
-   - 웹 검색 결과 활용
-   - 객관적이고 정확한 정보 제공
-
-4. 스타일:
+3. 스타일:
    - 전문적이고 명확한 어조
    - PPT 형식의 구조화된 내용
    - 읽기 쉽게 단락 구분"""
@@ -185,20 +164,11 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
         st.markdown(f'<div class="user-message">{prompt}</div>', unsafe_allow_html=True)
 
     with st.chat_message("assistant", avatar="🤖"):
-        # 웹 검색 수행
-        search_results = search_web(prompt)
-        
-        # AI 응답 생성
         model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
-            *st.session_state.messages,
+            *st.session_state.messages
         ]
-        if search_results:
-            messages.append({
-                "role": "system", 
-                "content": f"다음은 관련된 최신 웹 검색 결과입니다. 이를 참고하여 답변해주세요:\n{search_results}"
-            })
 
         stream = client.chat.completions.create(
             model=model_name,
