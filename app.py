@@ -12,24 +12,34 @@ st.set_page_config(
 # 스타일 수정
 st.markdown("""
 <style>
-    /* 전체 컨테이너 */
+    /* 전체 페이지 배경 */
+    .stApp {
+        background: #f0f2f5;
+    }
+
+    /* 중앙 컨테이너 */
     .main .block-container {
-        padding-top: 2rem;
-        max-width: 800px;
+        padding: 2rem 0;
+        max-width: 100%;
+    }
+
+    /* 채팅 컨테이너 */
+    .chat-container {
+        max-width: 750px;
         margin: 0 auto;
         background: white;
+        min-height: calc(100vh - 100px);
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
     /* 채팅 메시지 스타일 */
     .chat-message {
         padding: 1.5rem 2rem;
-        border-radius: 0;
-        margin-bottom: 0;
         line-height: 1.6;
         word-wrap: break-word;
         white-space: pre-wrap;
         width: 100%;
-        max-width: 800px;
         border-bottom: 1px solid #f0f0f0;
     }
 
@@ -43,12 +53,22 @@ st.markdown("""
         background: white;
     }
 
+    /* 입력창 컨테이너 */
+    .input-container {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 750px;
+        background: white;
+        padding: 1rem;
+        border-top: 1px solid #f0f0f0;
+    }
+
     /* 입력창 스타일 */
     .stChatInput {
-        max-width: 800px;
+        max-width: 700px;
         margin: 0 auto;
-        padding: 1rem;
-        border-radius: 0;
     }
 
     /* 사이드바 스타일 */
@@ -134,13 +154,20 @@ with st.sidebar:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# 이전 메시지 표시
+# 채팅 컨테이너 시작
+st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+
+# 메시지 표시 부분
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(f'<div class="{message["role"]}-message">{message["content"]}</div>', 
             unsafe_allow_html=True)
 
-# 사용자 입력 처리
+# 채팅 컨테이너 종료
+st.markdown('</div>', unsafe_allow_html=True)
+
+# 입력창 컨테이너
+st.markdown('<div class="input-container">', unsafe_allow_html=True)
 if prompt := st.chat_input("메시지를 입력하세요..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -170,3 +197,4 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
         )
         response = st.write_stream(stream)
     st.session_state.messages.append({"role": "assistant", "content": response})
+st.markdown('</div>', unsafe_allow_html=True)
