@@ -159,9 +159,11 @@ st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
 # 메시지 표시 부분
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(f'<div class="{message["role"]}-message">{message["content"]}</div>', 
-            unsafe_allow_html=True)
+    # st.chat_message() 대신 직접 div로 표시
+    st.markdown(
+        f'<div class="{message["role"]}-message chat-message">{message["content"]}</div>', 
+        unsafe_allow_html=True
+    )
 
 # 채팅 컨테이너 종료
 st.markdown('</div>', unsafe_allow_html=True)
@@ -170,8 +172,11 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div class="input-container">', unsafe_allow_html=True)
 if prompt := st.chat_input("메시지를 입력하세요..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(f'<div class="user-message">{prompt}</div>', unsafe_allow_html=True)
+    # 새 메시지도 직접 div로 표시
+    st.markdown(
+        f'<div class="user-message chat-message">{prompt}</div>', 
+        unsafe_allow_html=True
+    )
 
     with st.chat_message("assistant"):
         # Google 검색 수행
@@ -196,5 +201,9 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
             stream=True,
         )
         response = st.write_stream(stream)
+        st.markdown(
+            f'<div class="assistant-message chat-message">{response}</div>', 
+            unsafe_allow_html=True
+        )
     st.session_state.messages.append({"role": "assistant", "content": response})
 st.markdown('</div>', unsafe_allow_html=True)
