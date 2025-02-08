@@ -17,8 +17,8 @@ def get_base64_encoded_image(image_path):
 
 st.set_page_config(
     page_title="25th 3rd Soonicon ChatGPT",
-    page_icon=get_base64_encoded_image("logo.gif"),
-    layout="centered"  # wide에서 centered로 변경
+    page_icon="🤖",  # GIF 대신 이모지나 PNG 파일을 사용
+    layout="centered"
 )
 
 # CSS 스타일 수정
