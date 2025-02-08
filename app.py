@@ -13,10 +13,10 @@ print("Available secrets:", st.secrets)
 st.set_page_config(
     page_title="25th 3rd Soonicon ChatGPT",
     page_icon="🤖",
-    layout="wide"
+    layout="centered"  # wide에서 centered로 변경
 )
 
-# CSS 스타일 추가
+# CSS 스타일 수정
 st.markdown("""
 <style>
 /* 헤더 배너 스타일 */
@@ -28,6 +28,37 @@ st.markdown("""
     width: 850px;
     margin: 0 auto;
     display: block;
+}
+
+/* 채팅 컨테이너 스타일 */
+.main .block-container {
+    max-width: 850px !important;  /* 배너 크기에 맞춤 */
+    padding: 0 !important;
+    margin: 0 auto !important;
+}
+
+/* 메시지 스타일 */
+.chat-message {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    white-space: pre-wrap;
+}
+
+.user-message {
+    background-color: #f0f2f6;
+}
+
+.assistant-message {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+}
+
+/* 입력창 스타일 */
+.input-area {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 1rem;
 }
 
 /* 사이드바 로고 제거 */
