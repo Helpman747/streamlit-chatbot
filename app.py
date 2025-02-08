@@ -289,7 +289,7 @@ with st.sidebar:
     
     # 대화 기록이 있는 경우 표시
     if "messages" in st.session_state and len(st.session_state.messages) > 0:
-        for idx, msg in enumerate(st.session_state.messages[-5:]):
+        for idx, msg in enumerate(st.session_state.messages[-10:]):
             if msg["role"] == "user":
                 st.markdown(f"{msg['content'][:30]}...")
     else:
@@ -308,6 +308,12 @@ if "messages" not in st.session_state:
             "content": "안녕하세요! 무엇을 도와드릴까요?"
         }
     ]
+
+# 메시지 개수 제한 추가
+MAX_MESSAGES = 20
+if len(st.session_state.messages) > MAX_MESSAGES:
+    # 최근 20개 메시지만 유지
+    st.session_state.messages = st.session_state.messages[-MAX_MESSAGES:]
 
 # 채팅 컨테이너 시작
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
