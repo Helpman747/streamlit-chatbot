@@ -223,13 +223,18 @@ def google_search(query, num_results=5):
         print(f"검색 시작: {query}")
         print(f"API 키: {st.secrets['google_api_key'][:10]}...")
         print(f"검색 엔진 ID: {st.secrets['google_cse_id']}")
-        print(f"전체 secrets: {st.secrets}")  # 디버깅용 추가
+        
+        # 나무위키 검색을 위한 쿼리 수정
+        if "나무위키" in query.lower():
+            search_query = f"site:namu.wiki {query}"
+        else:
+            search_query = query
         
         service = build("customsearch", "v1", developerKey=st.secrets["google_api_key"])
         
         try:
             result = service.cse().list(
-                q=query,
+                q=search_query,
                 cx=st.secrets["google_cse_id"],
                 num=num_results,
                 lr='lang_ko',
@@ -242,8 +247,14 @@ def google_search(query, num_results=5):
             if "items" in result:
                 search_results = []
                 for item in result["items"]:
+                    # 나무위키 결과인 경우 특별 처리
+                    if "namu.wiki" in item['link']:
+                        title = f"나무위키: {item['title']}"
+                    else:
+                        title = item['title']
+                        
                     search_results.append(
-                        f"제목: {item['title']}\n"
+                        f"제목: {title}\n"
                         f"내용: {item['snippet']}\n"
                         f"출처: {item['link']}"
                     )
