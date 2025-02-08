@@ -15,7 +15,8 @@ st.markdown("""
     /* 전체 컨테이너 */
     .main .block-container {
         padding-top: 2rem;
-        max-width: 1000px;
+        max-width: 1000px;  /* 전체 너비 1000px로 설정 */
+        margin: 0 auto;     /* 중앙 정렬 */
         background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
     }
 
@@ -32,6 +33,9 @@ st.markdown("""
         line-height: 1.8;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
+        word-wrap: break-word;      /* 자동 줄바꿈 */
+        white-space: pre-wrap;      /* 줄바꿈 보존 */
+        max-width: 1000px;          /* 최대 너비 설정 */
     }
     .chat-message:hover {
         transform: translateY(-2px);
@@ -42,6 +46,7 @@ st.markdown("""
     .user-message {
         background: linear-gradient(135deg, #e8f0fe, #ffffff);
         margin-left: 15%;
+        margin-right: 5%;          /* 오른쪽 여백 추가 */
         border: 1px solid #e9ecef;
     }
 
@@ -49,6 +54,7 @@ st.markdown("""
     .ai-message {
         background: linear-gradient(135deg, #ffffff, #f8f9fa);
         margin-right: 15%;
+        margin-left: 5%;           /* 왼쪽 여백 추가 */
         border: 1px solid #e9ecef;
         font-size: 1.1rem;
     }
