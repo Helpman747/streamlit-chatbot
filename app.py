@@ -13,6 +13,55 @@ st.set_page_config(
 # CSS 스타일 직접 포함
 st.markdown("""
 <style>
+/* 헤더 스타일 */
+.header-banner {
+    background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
+    color: white;
+    padding: 0.8rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 2rem;
+}
+
+.header-logo {
+    width: 40px;
+    height: 40px;
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.header-text {
+    flex-grow: 1;
+}
+
+.header-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    color: #ffffff;
+}
+
+.header-subtitle {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-top: 0.2rem;
+}
+
 /* 전체 페이지 배경 */
 .stApp {
     background: #f7f7f8;
@@ -27,6 +76,7 @@ st.markdown("""
     min-height: 100vh;
     border-radius: 0;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding-top: 0 !important;  /* 헤더 아래 패딩 제거 */
 }
 
 /* 제목 */
@@ -104,6 +154,19 @@ h1 {
     background: #a8a8a8;
 }
 </style>
+
+<!-- 헤더 배너 추가 -->
+<div class="header-banner">
+    <div class="header-content">
+        <div class="header-logo">
+            🎵
+        </div>
+        <div class="header-text">
+            <div class="header-title">Music GPT</div>
+            <div class="header-subtitle">AI 음악 전문가와 대화하기</div>
+        </div>
+    </div>
+</div>
 """, unsafe_allow_html=True)
 
 # OpenAI 클라이언트 초기화
