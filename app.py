@@ -37,7 +37,12 @@ client = OpenAI(api_key=st.secrets["openai_api_key"])
 # 시스템 프롬프트 수정
 SYSTEM_PROMPT = """당신은 지식이 풍부한 AI 어시스턴트입니다. 이전 대화 내용을 기억하고 맥락을 이해하여 답변해야 합니다.
 
-1. 답변 구조:
+1. 미래 날짜 처리:
+   - 미래 날짜가 포함된 질문을 인식
+   - 미래 정보를 제공할 수 없음을 명확히 설명
+   - 가장 최신 정보나 관련된 유사 정보를 제안
+
+2. 답변 구조:
    📌 개요
    - 질문에 대한 핵심 답변을 1-2문장으로 요약
    - 이전 대화와 연결되는 부분 언급
@@ -52,23 +57,23 @@ SYSTEM_PROMPT = """당신은 지식이 풍부한 AI 어시스턴트입니다. �
    - 관련된 흥미로운 사실이나 통계
    - 실제 사례나 예시 포함
 
-2. 형식 가이드:
+3. 형식 가이드:
    - 각 섹션 사이에 빈 줄 추가하여 가독성 확보
    - 긴 문단은 피하고 2-3문장으로 분리
    - 중요한 수치나 날짜는 굵게 표시
    - 적절한 이모지로 섹션 구분
    - 표나 목록 활용하여 정보 구조화
 
-3. 맥락 관리:
+4. 맥락 관리:
    - 이전 대화 내용 참조 시 "이전 대화에서 언급된..."
    - 새로운 정보 추가 시 "추가 정보로는..."
    - 관련 후속 질문 2-3개 제안
 
-4. 검색 결과 활용:
+5. 검색 결과 활용:
    - 검색 결과와 이전 대화 내용을 자연스럽게 통합
    - 최신 정보 우선 활용
 
-5. 전문성 유지:
+6. 전문성 유지:
    - 공식적이고 전문적인 어조 사용
    - 정확한 용어와 설명 제공
    - 불확실한 정보는 "~로 알려져 있습니다" 형식 사용
@@ -251,7 +256,22 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # 입력 영역
 st.markdown('<div class="input-area">', unsafe_allow_html=True)
+
+def handle_future_date_query(query):
+    # 미래 날짜 감지
+    future_date_pattern = r"(20[2-9][0-9]년\s*[0-9]{1,2}월\s*[0-9]{1,2}일?|20[2-9][0-9]년\s*[0-9]{1,2}월\s*첫째주|20[2-9][0-9]년\s*[0-9]{1,2}월\s*둘째주|20[2-9][0-9]년\s*[0-9]{1,2}월\s*셋째주|20[2-9][0-9]년\s*[0-9]{1,2}월\s*넷째주)"
+    if re.search(future_date_pattern, query):
+        return "죄송합니다, 미래의 정보는 제공할 수 없습니다. 대신 최신 정보를 제공해드리겠습니다. 최신 정보를 원하시면 재질문 해주시면 감사하겠습니다."
+    return None
+
+# 메시지 처리 부분 수정
 if prompt := st.chat_input("메시지를 입력하세요..."):
+    # 미래 날짜 처리
+    future_date_response = handle_future_date_query(prompt)
+    if future_date_response:
+        st.session_state.messages.append({"role": "assistant", "content": future_date_response})
+        st.experimental_rerun()
+    
     st.session_state.messages.append({"role": "user", "content": prompt})
     
     # 검색 결과 가져오기
