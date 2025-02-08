@@ -225,18 +225,17 @@ if "messages" not in st.session_state:
 
 # 이전 메시지 표시
 for message in st.session_state.messages:
-    with st.chat_message(message["role"], 
-        avatar="" if message["role"] == "user" else ""):
+    with st.chat_message(message["role"]):
         st.markdown(f'<div class="{message["role"]}-message">{message["content"]}</div>', 
             unsafe_allow_html=True)
 
 # 사용자 입력 처리
 if prompt := st.chat_input("메시지를 입력하세요..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user", avatar=""):
+    with st.chat_message("user"):
         st.markdown(f'<div class="user-message">{prompt}</div>', unsafe_allow_html=True)
 
-    with st.chat_message("assistant", avatar=""):
+    with st.chat_message("assistant"):
         # Google 검색 수행
         search_results = google_search(prompt)
         
