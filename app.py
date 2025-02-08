@@ -291,6 +291,7 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
     
     # 검색 결과 가져오기
     search_results = google_search(prompt)
+    print(f"검색 결과: {search_results}")  # 디버깅용
     
     # 시스템 메시지 구성
     messages = [
@@ -299,9 +300,15 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
     
     # 검색 결과가 있으면 추가 컨텍스트 제공
     if search_results:
+        context_message = f"""다음은 사용자의 질문과 관련된 최신 정보입니다:
+
+{search_results}
+
+위 정보를 참고하여 최신 정보를 포함해 답변해주세요."""
+        
         messages.append({
-            "role": "system", 
-            "content": f"다음은 사용자의 질문과 관련된 최신 정보입니다. 이를 참고하여 답변해주세요:\n\n{search_results}"
+            "role": "system",
+            "content": context_message
         })
     
     # 대화 히스토리 추가
