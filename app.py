@@ -15,6 +15,7 @@ st.markdown("""
     .main .block-container {
         padding-top: 2rem;
         max-width: 1000px;
+        background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
     }
 
     /* 메시지 컨테이너 스타일 */
@@ -28,19 +29,24 @@ st.markdown("""
         border-radius: 0.8rem;
         margin-bottom: 1.5rem;
         line-height: 1.8;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .chat-message:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     }
 
     /* 사용자 메시지 */
     .user-message {
-        background-color: #f8f9fa;
+        background: linear-gradient(135deg, #e8f0fe, #ffffff);
         margin-left: 15%;
         border: 1px solid #e9ecef;
     }
 
     /* AI 메시지 */
     .ai-message {
-        background-color: #ffffff;
+        background: linear-gradient(135deg, #ffffff, #f8f9fa);
         margin-right: 15%;
         border: 1px solid #e9ecef;
         font-size: 1.1rem;
@@ -49,14 +55,14 @@ st.markdown("""
     /* 제목 스타일 */
     .main-title {
         text-align: center;
-        color: #1a73e8;
-        font-size: 2.2rem;
-        font-weight: 600;
+        background: linear-gradient(45deg, #1a73e8, #4285f4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2.5rem;
+        font-weight: 700;
         margin-bottom: 2rem;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
 
     /* 입력창 스타일 */
@@ -66,38 +72,62 @@ st.markdown("""
         background: white;
         border-radius: 15px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border: 2px solid #e8f0fe;
+        transition: all 0.3s ease;
+    }
+    .stChatInput:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 4px 15px rgba(26,115,232,0.2);
     }
 
     /* 사이드바 스타일 */
     .css-1d391kg {
+        background: linear-gradient(to bottom, #ffffff, #f8f9fa);
         padding: 2rem 1rem;
+    }
+
+    /* 버튼 스타일 */
+    .stButton>button {
+        background: linear-gradient(45deg, #1a73e8, #4285f4);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(26,115,232,0.3);
+    }
+
+    /* 선택 박스 스타일 */
+    .stSelectbox {
+        border-radius: 8px;
+        border: 2px solid #e8f0fe;
+    }
+    .stSelectbox:hover {
+        border-color: #1a73e8;
     }
 
     /* 강조 텍스트 */
     .highlight {
-        background-color: #e8f0fe;
+        background: linear-gradient(120deg, #e8f0fe 0%, #e8f0fe 100%);
         padding: 0.2rem 0.5rem;
         border-radius: 4px;
-    }
-
-    /* 목록 스타일 */
-    .ai-message ul {
-        margin: 1rem 0;
-        padding-left: 1.5rem;
-    }
-
-    .ai-message li {
-        margin: 0.5rem 0;
+        font-weight: 500;
     }
 
     /* 섹션 제목 */
     .section-title {
         color: #1a73e8;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         font-weight: 600;
-        margin: 1.5rem 0 0.8rem;
+        margin: 1.5rem 0 1rem;
+        padding-bottom: 0.5rem;
         border-bottom: 2px solid #e8f0fe;
-        padding-bottom: 0.3rem;
+        background: linear-gradient(to right, #1a73e8, #4285f4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -129,22 +159,35 @@ SYSTEM_PROMPT = """당신은 전문적인 AI 어시스턴트입니다. 답변할
 
 # 사이드바 설정
 with st.sidebar:
-    st.markdown("### ⚙️ 설정")
+    st.markdown("### 🎨 테마 설정")
+    theme = st.selectbox(
+        "색상 테마",
+        ["파랑 계열", "보라 계열", "초록 계열"],
+        key="theme"
+    )
+    
+    st.markdown("### ⚙️ 모델 설정")
     model = st.selectbox(
         "모델 선택",
         ["GPT-4 (고성능)", "GPT-3.5 (빠른응답)"],
         format_func=lambda x: x.split(" ")[0]
     )
+    
     st.markdown("---")
-    st.markdown("### 📝 사용 방법")
-    st.markdown("1. 원하는 모델을 선택하세요")
-    st.markdown("2. 질문을 입력하세요")
-    st.markdown("3. 엔터를 눌러 전송하세요")
-    st.markdown("---")
-    st.markdown("### 🎯 특징")
-    st.markdown("• 전문적인 답변 제공")
-    st.markdown("• PPT 스타일 포맷팅")
-    st.markdown("• 실시간 스트리밍 응답")
+    st.markdown("### 💬 대화 기록")
+    
+    # 대화 기록이 있는 경우 표시
+    if "messages" in st.session_state and len(st.session_state.messages) > 0:
+        for idx, msg in enumerate(st.session_state.messages[-5:]):  # 최근 5개 메시지만 표시
+            if msg["role"] == "user":
+                st.markdown(f"🧑‍💻 {msg['content'][:30]}...")  # 첫 30자만 표시
+    else:
+        st.markdown("아직 대화 기록이 없습니다.")
+    
+    # 기록 초기화 버튼
+    if st.button("대화 기록 초기화"):
+        st.session_state.messages = []
+        st.experimental_rerun()
 
 # 세션 상태 초기화
 if "messages" not in st.session_state:
