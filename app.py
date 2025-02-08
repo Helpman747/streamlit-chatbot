@@ -162,11 +162,6 @@ SYSTEM_PROMPT = """당신은 최신 트렌드와 정보를 잘 아는 AI 어시�
 # Google 검색 함수 수정
 def google_search(query, num_results=3):
     try:
-        st.write("검색 시도 중...")  # 디버깅 메시지
-        
-        # API 키와 검색 엔진 ID 확인
-        st.write(f"CSE ID: {st.secrets['GOOGLE_CSE_ID']}")
-        
         service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
         result = service.cse().list(
             q=query,
@@ -175,16 +170,13 @@ def google_search(query, num_results=3):
         ).execute()
 
         if "items" in result:
-            st.write(f"{len(result['items'])}개의 검색 결과 찾음")  # 디버깅 메시지
             search_results = "\n\n".join([
                 f"제목: {item['title']}\n내용: {item['snippet']}\n출처: {item['link']}"
                 for item in result["items"]
             ])
             return search_results
-        st.write("검색 결과 없음")  # 디버깅 메시지
         return ""
     except Exception as e:
-        st.write(f"검색 중 오류 발생: {str(e)}")  # 오류 메시지
         return ""
 
 # 사이드바 설정
