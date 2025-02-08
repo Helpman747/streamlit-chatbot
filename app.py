@@ -208,6 +208,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # 입력 영역
 st.markdown('<div class="input-area">', unsafe_allow_html=True)
 if prompt := st.chat_input("메시지를 입력하세요..."):
+    # 사용자 메시지 추가
     st.session_state.messages.append({"role": "user", "content": prompt})
     
     # AI 응답 생성 및 처리
@@ -240,8 +241,8 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
                 unsafe_allow_html=True
             )
 
+    # 응답 저장
     st.session_state.messages.append({"role": "assistant", "content": response})
-    st.experimental_rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
 
