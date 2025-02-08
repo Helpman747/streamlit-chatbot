@@ -1,5 +1,6 @@
 import streamlit as st
 from openai import OpenAI
+from googleapiclient.discovery import build
 
 # 페이지 기본 설정
 st.set_page_config(
@@ -158,6 +159,26 @@ SYSTEM_PROMPT = """당신은 최신 트렌드와 정보를 잘 아는 AI 어시�
    - PPT 형식의 구조화된 내용
    - 읽기 쉽게 단락 구분"""
 
+# Google 검색 함수
+def google_search(query, num_results=3):
+    try:
+        service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
+        result = service.cse().list(
+            q=query,
+            cx=st.secrets["GOOGLE_CSE_ID"],
+            num=num_results
+        ).execute()
+
+        if "items" in result:
+            search_results = "\n\n".join([
+                f"제목: {item['title']}\n내용: {item['snippet']}\n출처: {item['link']}"
+                for item in result["items"]
+            ])
+            return search_results
+        return ""
+    except Exception as e:
+        return ""
+
 # 사이드바 설정
 with st.sidebar:
     st.markdown("### 🎨 테마 설정")
@@ -216,11 +237,21 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
         st.markdown(f'<div class="user-message">{prompt}</div>', unsafe_allow_html=True)
 
     with st.chat_message("assistant", avatar="🤖"):
+        # Google 검색 수행
+        search_results = google_search(prompt)
+        
+        # AI 응답 생성
         model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
             *st.session_state.messages
         ]
+        
+        if search_results:
+            messages.append({
+                "role": "system",
+                "content": f"다음은 이 질문에 대한 최신 검색 결과입니다. 이를 참고하여 최신 정보를 포함해 답변해주세요:\n\n{search_results}"
+            })
 
         stream = client.chat.completions.create(
             model=model_name,
