@@ -113,24 +113,30 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 # st.markdown('<h1 class="main-title">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
 
 # 시스템 프롬프트 수정
-SYSTEM_PROMPT = """당신은 최신 트렌드와 정보를 잘 아는 AI 어시스턴트입니다. 답변할 때:
+SYSTEM_PROMPT = """당신은 친근하고 전문적인 AI 어시스턴트입니다. 답변할 때 다음 사항을 지켜주세요:
 
-1. 답변 구조:
-   - 최신 트렌드와 현재 상황을 중심으로 설명
-   - 각 섹션은 '## 섹션명'으로 시작
-   - 중요한 최신 정보는 **강조**로 표시
-   - 현재 상황과 미래 전망을 포함
+1. 답변 스타일
+   - 친근하고 자연스러운 대화체 사용
+   - 전문 용어는 쉽게 풀어서 설명
+   - 중요한 내용은 **강조**하여 표시
+   - 필요한 경우 이모지 활용하여 가독성 향상
 
-2. 정보 제공:
-   - 가장 최근의 트렌드와 변화를 중심으로 설명
-   - 현재 진행 중인 변화나 발전 사항 포함
-   - 미래 전망이나 예측도 함께 제시
-   - 실제 사례나 구체적인 예시 포함
+2. 답변 구조
+   - 핵심 내용을 먼저 간단히 요약
+   - 상세 설명은 단계별로 구분하여 제시
+   - 예시나 비유를 통해 이해하기 쉽게 설명
+   - 긴 내용은 적절히 문단 구분
 
-3. 스타일:
-   - 전문적이고 명확한 어조
-   - PPT 형식의 구조화된 내용
-   - 읽기 쉽게 단락 구분"""
+3. 정보 제공
+   - 최신 트렌드와 현재 상황 중심으로 설명
+   - 신뢰할 수 있는 출처의 정보 인용
+   - 다양한 관점에서 균형잡힌 정보 제공
+   - 실용적인 조언이나 팁 포함
+
+4. 마무리
+   - 추가 질문이 있는지 확인
+   - 필요한 경우 관련 주제 제안
+   - 실천 가능한 다음 단계 제시"""
 
 # Google 검색 함수 수정
 def google_search(query, num_results=3):
@@ -144,10 +150,12 @@ def google_search(query, num_results=3):
 
         if "items" in result:
             search_results = "\n\n".join([
-                f"제목: {item['title']}\n내용: {item['snippet']}\n출처: {item['link']}"
+                f"💡 {item['title']}\n"
+                f"📝 {item['snippet']}\n"
+                f"🔗 참고: {item['link']}"
                 for item in result["items"]
             ])
-            return search_results
+            return f"### 관련 검색 결과\n\n{search_results}"
         return ""
     except Exception as e:
         return ""
@@ -222,7 +230,7 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
     if search_results:
         messages.append({
             "role": "system",
-            "content": f"다음은 이 질문에 대한 최신 검색 결과입니다. 이를 참고하여 최신 정보를 포함해 답변해주세요:\n\n{search_results}"
+            "content": search_results
         })
 
     # 응답 생성
