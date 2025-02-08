@@ -1,5 +1,6 @@
 import streamlit as st
 from openai import OpenAI
+from duckduckgo_search import ddg
 
 # 페이지 기본 설정
 st.set_page_config(
@@ -108,15 +109,44 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 # 제목
 st.markdown('<h1 class="main-title">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
 
-# 시스템 프롬프트 설정
+# 웹 검색 함수 추가
+def search_web(query, num_results=3):
+    try:
+        results = ddg(query, max_results=num_results)
+        if results:
+            search_results = "\n\n".join([
+                f"출처: {r['link']}\n{r['title']}\n{r['body']}"
+                for r in results
+            ])
+            return f"\n\n관련 웹 검색 결과:\n\n{search_results}"
+        return ""
+    except Exception as e:
+        return ""
+
+# 시스템 프롬프트 수정
 SYSTEM_PROMPT = """당신은 전문적인 AI 어시스턴트입니다. 답변할 때:
-1. 주요 섹션은 '## 섹션명'으로 구분하여 표시
-2. 중요한 정보는 **강조** 표시
-3. 목록은 깔끔한 글머리 기호로 표시
-4. 각 섹션 사이에 적절한 여백 유지
-5. 전문 용어는 `코드 블록`으로 표시
-6. 답변은 항상 구조적이고 체계적으로 정리
-7. PPT 형식처럼 깔끔하게 정보 전달"""
+
+1. 답변 구조:
+   - 주요 내용을 섹션별로 구분하여 설명
+   - 각 섹션은 '## 섹션명'으로 시작
+   - 중요 정보는 **강조** 표시
+   - 전문 용어는 `코드 블록`으로 표시
+
+2. 포맷팅:
+   - 깔끔한 글머리 기호로 목록 작성
+   - 적절한 여백 유지
+   - 표나 코드는 마크다운 형식으로 정리
+
+3. 정보 제공:
+   - 가능한 최신 정보 포함
+   - 신뢰할 수 있는 출처 인용
+   - 웹 검색 결과 활용
+   - 객관적이고 정확한 정보 제공
+
+4. 스타일:
+   - 전문적이고 명확한 어조
+   - PPT 형식의 구조화된 내용
+   - 읽기 쉽게 단락 구분"""
 
 # 사이드바 설정
 with st.sidebar:
@@ -150,20 +180,29 @@ for message in st.session_state.messages:
 
 # 사용자 입력 처리
 if prompt := st.chat_input("메시지를 입력하세요..."):
-    # 사용자 메시지 추가
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user", avatar="🧑‍💻"):
         st.markdown(f'<div class="user-message">{prompt}</div>', unsafe_allow_html=True)
 
-    # AI 응답 생성
     with st.chat_message("assistant", avatar="🤖"):
+        # 웹 검색 수행
+        search_results = search_web(prompt)
+        
+        # AI 응답 생성
         model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            *st.session_state.messages,
+        ]
+        if search_results:
+            messages.append({
+                "role": "system", 
+                "content": f"다음은 관련된 최신 웹 검색 결과입니다. 이를 참고하여 답변해주세요:\n{search_results}"
+            })
+
         stream = client.chat.completions.create(
             model=model_name,
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
+            messages=messages,
             stream=True,
         )
         response = st.write_stream(stream)
