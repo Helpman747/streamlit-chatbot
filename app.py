@@ -188,14 +188,17 @@ def google_search(query, num_results=3):
 
         if "items" in result:
             search_results = "\n\n".join([
-                f"💡 {item['title']}\n"
-                f"📝 {item['snippet']}\n"
-                f"🔗 참고: {item['link']}"
+                f"📌 {item['title']}\n"
+                f"{item['snippet']}\n"
+                f"[자세히 보기]({item['link']})"
                 for item in result["items"]
             ])
-            return f"### 관련 검색 결과\n\n{search_results}"
-        return ""
+            return f"## 참고 자료\n\n{search_results}"
+        else:
+            print(f"검색 결과 없음: {query}")  # 디버깅용
+            return ""
     except Exception as e:
+        print(f"검색 중 오류 발생: {str(e)}")  # 디버깅용
         return ""
 
 # 사이드바 설정
@@ -259,6 +262,7 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
     
     # AI 응답 생성 및 처리
     search_results = google_search(prompt)
+    print(f"검색 결과: {search_results}")  # 디버깅용
     model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
