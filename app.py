@@ -177,29 +177,39 @@ SYSTEM_PROMPT = """당신은 친근하고 전문적인 AI 어시스턴트입니�
    - 실천 가능한 다음 단계 제시"""
 
 # Google 검색 함수 수정
-def google_search(query, num_results=3):
+def google_search(query, num_results=5):  # 검색 결과 수 증가
     try:
-        print(f"검색 시도: {query}")  # 디버깅 추가
-        print(f"API Key 확인: {st.secrets['GOOGLE_API_KEY'][:5]}...")  # API 키 앞부분만 출력
-        print(f"CSE ID 확인: {st.secrets['GOOGLE_CSE_ID']}")
+        print(f"검색 시도: {query}")
+        
+        # 검색어 최적화
+        search_query = f"{query} site:namu.wiki OR site:wikipedia.org OR site:korean.go.kr"
         
         service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
         result = service.cse().list(
-            q=query,
+            q=search_query,
             cx=st.secrets["GOOGLE_CSE_ID"],
-            num=num_results
+            num=num_results,
+            lr='lang_ko',  # 한국어 결과 우선
+            gl='kr',       # 한국 지역 우선
+            safe='off'     # 안전검색 해제
         ).execute()
 
-        print(f"검색 결과: {result.keys()}")  # 응답 구조 확인
+        print(f"검색 결과: {result.keys()}")
         
         if "items" in result:
-            search_results = "\n\n".join([
-                f"📌 {item['title']}\n"
-                f"{item['snippet']}\n"
-                f"[자세히 보기]({item['link']})"
-                for item in result["items"]
-            ])
-            return f"## 참고 자료\n\n{search_results}"
+            search_results = []
+            for item in result["items"]:
+                # 제목과 내용에서 검색어 강조
+                title = item['title'].replace(query, f"**{query}**")
+                snippet = item['snippet'].replace(query, f"**{query}**")
+                
+                search_results.append(
+                    f"📌 {title}\n"
+                    f"{snippet}\n"
+                    f"[자세히 보기]({item['link']})"
+                )
+            
+            return f"## 참고 자료\n\n" + "\n\n".join(search_results)
         else:
             print(f"검색 결과 없음: {query}")
             return ""
