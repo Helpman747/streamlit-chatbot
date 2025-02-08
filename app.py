@@ -15,51 +15,25 @@ st.markdown("""
 <style>
 /* 헤더 스타일 */
 .header-banner {
-    background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
-    color: white;
-    padding: 0.8rem 0;
+    width: 100%;
+    background: #1a1a1a;
+    padding: 1rem 0;
     position: sticky;
     top: 0;
     z-index: 100;
-    width: 100%;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .header-content {
     max-width: 800px;
     margin: 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0 2rem;
+    text-align: center;
 }
 
-.header-logo {
-    width: 40px;
-    height: 40px;
-    background: #ffffff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-}
-
-.header-text {
-    flex-grow: 1;
-}
-
-.header-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin: 0;
-    color: #ffffff;
-}
-
-.header-subtitle {
-    font-size: 0.85rem;
-    opacity: 0.8;
-    margin-top: 0.2rem;
+.header-image {
+    max-width: 800px;  /* 컨테이너 너비에 맞춤 */
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* 전체 페이지 배경 */
@@ -158,13 +132,7 @@ h1 {
 <!-- 헤더 배너 추가 -->
 <div class="header-banner">
     <div class="header-content">
-        <div class="header-logo">
-            🎵
-        </div>
-        <div class="header-text">
-            <div class="header-title">Music GPT</div>
-            <div class="header-subtitle">AI 음악 전문가와 대화하기</div>
-        </div>
+        <img src="배너이미지주소" alt="25th 3rd 수니콘미션" class="header-image">
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -261,8 +229,8 @@ if "messages" not in st.session_state:
 # 채팅 컨테이너 시작
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
-# 컨테이너 제목 추가
-st.markdown('<h1 style="text-align: center; padding: 1rem;">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
+# 제목 부분 제거 (상단 배너로 대체)
+# st.markdown('<h1 style="text-align: center; padding: 1rem;">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
 
 # 메시지 영역 시작
 st.markdown('<div class="messages-container">', unsafe_allow_html=True)
