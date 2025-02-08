@@ -179,6 +179,10 @@ SYSTEM_PROMPT = """당신은 친근하고 전문적인 AI 어시스턴트입니�
 # Google 검색 함수 수정
 def google_search(query, num_results=3):
     try:
+        print(f"검색 시도: {query}")  # 디버깅 추가
+        print(f"API Key 확인: {st.secrets['GOOGLE_API_KEY'][:5]}...")  # API 키 앞부분만 출력
+        print(f"CSE ID 확인: {st.secrets['GOOGLE_CSE_ID']}")
+        
         service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
         result = service.cse().list(
             q=query,
@@ -186,6 +190,8 @@ def google_search(query, num_results=3):
             num=num_results
         ).execute()
 
+        print(f"검색 결과: {result.keys()}")  # 응답 구조 확인
+        
         if "items" in result:
             search_results = "\n\n".join([
                 f"📌 {item['title']}\n"
@@ -195,10 +201,10 @@ def google_search(query, num_results=3):
             ])
             return f"## 참고 자료\n\n{search_results}"
         else:
-            print(f"검색 결과 없음: {query}")  # 디버깅용
+            print(f"검색 결과 없음: {query}")
             return ""
     except Exception as e:
-        print(f"검색 중 오류 발생: {str(e)}")  # 디버깅용
+        print(f"검색 중 오류 발생: {str(e)}")
         return ""
 
 # 사이드바 설정
