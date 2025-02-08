@@ -95,8 +95,8 @@ st.markdown("""
 # OpenAI 클라이언트 초기화
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# 제목
-st.markdown('<h1 class="main-title">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
+# 제목 제거 (이미 컨테이너 안에 포함될 것이므로)
+# st.markdown('<h1 class="main-title">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
 
 # 시스템 프롬프트 수정
 SYSTEM_PROMPT = """당신은 최신 트렌드와 정보를 잘 아는 AI 어시스턴트입니다. 답변할 때:
@@ -165,10 +165,18 @@ with st.sidebar:
 
 # 세션 상태 초기화
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {
+            "role": "assistant", 
+            "content": "안녕하세요! 무엇을 도와드릴까요?"
+        }
+    ]
 
 # 채팅 컨테이너 시작
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+
+# 컨테이너 제목 추가
+st.markdown('<h1 style="text-align: center; padding: 1rem;">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
 
 # 메시지 영역 시작
 st.markdown('<div class="messages-container">', unsafe_allow_html=True)
