@@ -2,6 +2,7 @@
 from openai import OpenAI
 from googleapiclient.discovery import build
 import os
+import json  # 디버깅용 추가
 
 # 페이지 기본 설정
 st.set_page_config(
@@ -176,12 +177,23 @@ SYSTEM_PROMPT = """당신은 친근하고 전문적인 AI 어시스턴트입니�
    - 필요한 경우 관련 주제 제안
    - 실천 가능한 다음 단계 제시"""
 
+# Google API 연결 테스트
+def test_google_api():
+    try:
+        service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
+        return "Google API 연결 성공"
+    except Exception as e:
+        return f"Google API 연결 실패: {str(e)}"
+
+# 시작할 때 API 테스트
+print(test_google_api())
+
 # Google 검색 함수 수정
-def google_search(query, num_results=5):  # 검색 결과 수 증가
+def google_search(query, num_results=5):
     try:
         print(f"검색 시도: {query}")
+        print(f"API 상태: {test_google_api()}")
         
-        # 검색어 최적화
         search_query = f"{query} site:namu.wiki OR site:wikipedia.org OR site:korean.go.kr"
         
         service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
@@ -189,29 +201,25 @@ def google_search(query, num_results=5):  # 검색 결과 수 증가
             q=search_query,
             cx=st.secrets["GOOGLE_CSE_ID"],
             num=num_results,
-            lr='lang_ko',  # 한국어 결과 우선
-            gl='kr',       # 한국 지역 우선
-            safe='off'     # 안전검색 해제
+            lr='lang_ko',
+            gl='kr'
         ).execute()
 
-        print(f"검색 결과: {result.keys()}")
+        print(f"검색 응답: {json.dumps(result, ensure_ascii=False, indent=2)}")
         
         if "items" in result:
             search_results = []
             for item in result["items"]:
-                # 제목과 내용에서 검색어 강조
                 title = item['title'].replace(query, f"**{query}**")
                 snippet = item['snippet'].replace(query, f"**{query}**")
-                
                 search_results.append(
                     f"📌 {title}\n"
                     f"{snippet}\n"
                     f"[자세히 보기]({item['link']})"
                 )
-            
             return f"## 참고 자료\n\n" + "\n\n".join(search_results)
         else:
-            print(f"검색 결과 없음: {query}")
+            print("검색 결과 없음")
             return ""
     except Exception as e:
         print(f"검색 중 오류 발생: {str(e)}")
