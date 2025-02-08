@@ -271,12 +271,31 @@ def google_search(query, num_results=5):
 
 # 사이드바 설정
 with st.sidebar:
+    # 배너 이미지 추가 (검정색 부분 제거된 이미지 사용)
+    st.image("https://baegna.com/img/3rd.png", width=850)
+    
     st.markdown("### ⚙️ 모델 설정")
     model = st.selectbox(
         "모델 선택",
         ["GPT-4 (고성능)", "GPT-3.5 (빠른응답)"],
         format_func=lambda x: x.split(" ")[0]
     )
+    
+    st.markdown("---")
+    
+    # 사이트 설명 추가
+    st.markdown("### ℹ️ 안내사항")
+    st.markdown("""
+    - 🔒 이 페이지는 **수니그룹 멤버 전용**으로 사용할수 있습니다.
+    
+    - 🎯 수니콘 미션을 대비한 **연습용 페이지** 입니다.
+    
+    - 💰 유료모델로 운영되기 때문에 과도하게 검색하시면, 제가 비용을 지불하게 됩니다.
+    
+    - 🔄 답변 스타일과 결과값은 더 잘나올수 있게 계속 업데이트 중입니다.
+    
+    - 👨‍💻 제작자: **HelpMan**
+    """)
     
     st.markdown("---")
     st.markdown("### 💬 대화 기록")
