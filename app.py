@@ -271,7 +271,7 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
     if future_date_response:
         st.session_state.messages.append({"role": "assistant", "content": future_date_response})
         st.rerun()  # st.experimental_rerun() 대신 st.rerun() 사용
-        return  # 추가된 메시지 후 반환
+        continue  # 추가된 메시지 후 다음 반복으로 넘어감
     
     st.session_state.messages.append({"role": "user", "content": prompt})
     
