@@ -199,6 +199,9 @@ def google_search(query, num_results=5):
 
 # 사이드바 설정
 with st.sidebar:
+    # 로고 이미지 추가
+    st.image("logo.gif", width=200)  # 너비는 조절 가능
+    
     st.markdown("### ⚙️ 모델 설정")
     model = st.selectbox(
         "모델 선택",
