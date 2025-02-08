@@ -4,6 +4,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import os
 import json  # 디버깅용 추가
+import re
 
 # app.py 맨 위에 추가
 print("Available secrets:", st.secrets)
@@ -212,32 +213,33 @@ def google_search(query, num_results=5):
     try:
         print(f"검색 시작: {query}")  # 디버깅
         
-        # 검색 쿼리 수정 - 따옴표 제거 및 키워드 추출
+        # 검색 쿼리 전처리
         search_query = query.replace('"', '').replace('?', '').replace('!', '')
         
-        # 핵심 키워드 추출 (예: "배그나는 어떤 방송을 하는 사람이야?" -> "배그나 방송")
+        # 한글 키워드 추출
+        keywords = re.findall(r'[가-힣]+', search_query)
+        
+        # 불용어 제거
+        stop_words = ["은", "는", "이", "가", "을", "를", "에", "의", "으로", "로", "도", "만", "것"]
+        keywords = [word for word in keywords if word not in stop_words]
+        
+        # 최종 검색어 구성
         if "누구" in search_query or "어떤" in search_query:
-            keywords = []
-            for word in search_query.split():
-                if not any(stop in word for stop in ["은", "는", "이", "가", "을", "를", "에", "의"]):
-                    keywords.append(word)
-            search_query = " ".join(keywords[:3])  # 주요 키워드 3개만 사용
+            search_query = " ".join(keywords[:2])  # 주요 키워드 2개만 사용
         
         print(f"최종 검색 쿼리: {search_query}")  # 디버깅
         
         service = build("customsearch", "v1", developerKey=st.secrets["google_api_key"])
         
         try:
-            print(f"API 호출 시작...")  # 디버깅
             result = service.cse().list(
                 q=search_query,
                 cx=st.secrets["google_cse_id"],
                 num=num_results,
                 lr='lang_ko',
-                gl='kr'
+                gl='kr',
+                safe='off'  # 안전 검색 해제
             ).execute()
-            
-            print(f"API 응답 전체: {json.dumps(result, ensure_ascii=False, indent=2)}")  # 디버깅
             
             if "items" in result:
                 search_results = []
