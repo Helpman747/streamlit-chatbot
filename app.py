@@ -53,12 +53,38 @@ st.markdown("""
     margin-bottom: 100px;  /* 입력창 높이만큼 여백 */
 }
 
-/* 메시지 스타일 */
+/* 메시지 스타일 수정 */
 .chat-message {
-    padding: 1.5rem;
+    padding: 1.2rem;  /* 패딩 축소 */
     border-radius: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;  /* 마진 축소 */
     white-space: pre-wrap;
+}
+
+/* 섹션 간격 조정 */
+.chat-message h1, 
+.chat-message h2, 
+.chat-message h3 {
+    margin-top: 1rem;      /* 제목 위 여백 */
+    margin-bottom: 0.5rem; /* 제목 아래 여백 */
+}
+
+/* 문단 간격 조정 */
+.chat-message p {
+    margin-bottom: 0.5rem;  /* 문단 사이 여백 */
+    line-height: 1.4;       /* 줄 간격 축소 */
+}
+
+/* 목록 간격 조정 */
+.chat-message ul, 
+.chat-message ol {
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+    padding-left: 1.2rem;
+}
+
+.chat-message li {
+    margin-bottom: 0.2rem;
 }
 
 .user-message {
@@ -82,13 +108,11 @@ st.markdown("""
     padding: 1.5rem;
 }
 
-/* 소스 정보 스타일 */
+/* 출처 정보 스타일 */
 .source-info {
-    font-size: 0.8em;
-    color: #666;
-    border-top: 1px solid #eee;
-    margin-top: 1rem;
+    margin-top: 0.8rem;
     padding-top: 0.5rem;
+    font-size: 0.8em;
 }
 </style>
 """, unsafe_allow_html=True)
