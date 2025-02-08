@@ -139,18 +139,19 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 st.markdown('<h1 class="main-title">25th 3rd 수니콘미션 챗GPT</h1>', unsafe_allow_html=True)
 
 # 시스템 프롬프트 수정
-SYSTEM_PROMPT = """당신은 전문적인 AI 어시스턴트입니다. 답변할 때:
+SYSTEM_PROMPT = """당신은 최신 트렌드와 정보를 잘 아는 AI 어시스턴트입니다. 답변할 때:
 
 1. 답변 구조:
-   - 주요 내용을 섹션별로 구분하여 설명
+   - 최신 트렌드와 현재 상황을 중심으로 설명
    - 각 섹션은 '## 섹션명'으로 시작
-   - 중요 정보는 **강조** 표시
-   - 전문 용어는 `코드 블록`으로 표시
+   - 중요한 최신 정보는 **강조**로 표시
+   - 현재 상황과 미래 전망을 포함
 
-2. 포맷팅:
-   - 깔끔한 글머리 기호로 목록 작성
-   - 적절한 여백 유지
-   - 표나 코드는 마크다운 형식으로 정리
+2. 정보 제공:
+   - 가장 최근의 트렌드와 변화를 중심으로 설명
+   - 현재 진행 중인 변화나 발전 사항 포함
+   - 미래 전망이나 예측도 함께 제시
+   - 실제 사례나 구체적인 예시 포함
 
 3. 스타일:
    - 전문적이고 명확한 어조
@@ -188,6 +189,14 @@ with st.sidebar:
     if st.button("대화 기록 초기화"):
         st.session_state.messages = []
         st.experimental_rerun()
+
+    st.markdown("---")
+    st.markdown("### ⚠️ 정보 업데이트 알림")
+    st.markdown("""
+        • 현재 시점: **2025년**
+        • GPT 학습 데이터: ~2022년
+        • 시간에 민감한 정보는 추가 확인 필요
+    """)
 
 # 세션 상태 초기화
 if "messages" not in st.session_state:
