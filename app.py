@@ -6,56 +6,12 @@ from googleapiclient.discovery import build
 st.set_page_config(
     page_title="25th 3rd 수니콘미션 챗GPT",
     page_icon="🤖",
-    layout="wide"
+    layout="centered"
 )
 
-# 스타일 수정
-st.markdown("""
-<style>
-    /* 전체 페이지 배경 */
-    .stApp {
-        background: #f0f2f5;
-    }
-
-    /* 메인 컨테이너 */
-    .main .block-container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem;
-        background: white;
-        min-height: 100vh;
-    }
-
-    /* 메시지 스타일 */
-    .chat-message {
-        padding: 1.5rem 2rem;
-        line-height: 1.6;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    /* 사용자 메시지 */
-    .user-message {
-        background: #f7f7f8;
-    }
-
-    /* AI 메시지 */
-    .assistant-message {
-        background: white;
-    }
-
-    /* 입력창 스타일 */
-    .stChatInput {
-        max-width: 800px !important;
-        margin: 0 auto;
-    }
-
-    /* 사이드바 스타일 */
-    .css-1d391kg {
-        background: white;
-        padding: 2rem 1rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+# CSS 파일 로드
+with open('static/style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # OpenAI 클라이언트 초기화
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
