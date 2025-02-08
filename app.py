@@ -159,7 +159,6 @@ st.markdown('</div>', unsafe_allow_html=True)
 # 입력 영역
 st.markdown('<div class="input-area">', unsafe_allow_html=True)
 if prompt := st.chat_input("메시지를 입력하세요..."):
-    # 메시지 처리 로직
     st.session_state.messages.append({"role": "user", "content": prompt})
     
     # AI 응답 생성 및 처리
@@ -177,7 +176,9 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
         })
 
     # 응답 생성
+    message_placeholder = st.empty()
     response = ""
+    
     for chunk in client.chat.completions.create(
         model=model_name,
         messages=messages,
@@ -185,14 +186,10 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
     ):
         if chunk.choices[0].delta.content is not None:
             response += chunk.choices[0].delta.content
-            # 메시지 영역 내에서 실시간 업데이트
-            messages_html = ""
-            for msg in st.session_state.messages:
-                messages_html += f'<div class="{msg["role"]}-message chat-message">{msg["content"]}</div>'
-            if response:
-                messages_html += f'<div class="assistant-message chat-message">{response}</div>'
-            placeholder = st.empty()
-            placeholder.markdown(f'<div class="messages-container">{messages_html}</div>', unsafe_allow_html=True)
+            message_placeholder.markdown(
+                f'<div class="assistant-message chat-message">{response}</div>',
+                unsafe_allow_html=True
+            )
 
     st.session_state.messages.append({"role": "assistant", "content": response})
     st.experimental_rerun()
