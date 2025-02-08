@@ -16,19 +16,21 @@
 
 /* 메시지 스타일 */
 .chat-message {
-    padding: 1.5rem 2rem;
-    line-height: 1.6;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    line-height: 1.5;
 }
 
 /* 사용자 메시지 */
 .user-message {
-    background: #f7f7f8;
+    background-color: #f0f2f6;
 }
 
 /* AI 메시지 */
 .assistant-message {
-    background: white;
+    background-color: white;
+    border: 1px solid #e0e0e0;
 }
 
 /* 입력창 영역 */
@@ -53,4 +55,20 @@
 .css-1d391kg {
     background: white;
     padding: 2rem 1rem;
+}
+
+.chat-message h3 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1em;
+    color: #2563eb;
+}
+
+.chat-message a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.chat-message a:hover {
+    text-decoration: underline;
 } 
