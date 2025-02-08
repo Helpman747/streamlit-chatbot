@@ -145,7 +145,12 @@ def google_search(query, context=""):
                 snippet = re.sub(r'\.\.\.', '', snippet)  # ... 제거
                 snippet = re.sub(r'\s+', ' ', snippet).strip()  # 공백 정리
                 
-                search_results.append(f"**{title}**\n{snippet}\n[출처]({source})")
+                # 검색 결과 형식 검증
+                if title and snippet and source:
+                    search_results.append(f"**{title}**\n{snippet}\n[출처]({source})")
+                else:
+                    # 형식이 맞지 않는 경우, 기본 형식으로 표시
+                    search_results.append(f"**{title}**\n{snippet}\n[출처]({source})")
             
             return "\n\n".join(search_results)
         else:
@@ -232,11 +237,15 @@ def format_message(content, role):
         for part in parts:
             if part.startswith("**"):
                 lines = part.split("\n")
-                title = lines[0].replace("**", "")
-                snippet = lines[1]
-                source = lines[2].replace("[출처]", "🔗 출처:")
-                
-                formatted_content.append(f"### {title}\n{snippet}\n{source}")
+                if len(lines) >= 3:  # lines 리스트의 길이 확인
+                    title = lines[0].replace("**", "")
+                    snippet = lines[1]
+                    source = lines[2].replace("[출처]", "🔗 출처:")
+                    
+                    formatted_content.append(f"### {title}\n{snippet}\n{source}")
+                else:
+                    # 형식이 맞지 않는 경우, 기본 형식으로 표시
+                    formatted_content.append(part)
         
         return f"""<div class="{role}-message chat-message">
 {"\n\n".join(formatted_content)}
