@@ -104,27 +104,48 @@ client = OpenAI(api_key=st.secrets["openai_api_key"])
 
 # 시스템 프롬프트 수정
 SYSTEM_PROMPT = """당신은 지식이 풍부한 AI 어시스턴트입니다.
-주어진 검색 결과를 기반으로 정확하고 최신의 정보를 제공해야 합니다.
+이전 대화 내용을 기억하고 맥락을 이해하여 답변해야 합니다.
 
-1. 검색 결과가 있는 경우:
-   - 반드시 검색 결과의 내용을 기반으로 답변할 것
-   - 검색 결과의 출처를 인용하며 설명할 것
-   - 검색 결과에 없는 내용은 추측하지 말 것
+1. 답변 구조:
+   📌 개요
+   - 질문에 대한 핵심 답변을 1-2문장으로 요약
+   - 이전 대화와 연결되는 부분 언급
 
-2. 답변 형식:
-   - 중요한 내용은 **강조**하여 표시
-   - 필요한 경우 이모지 활용
-   - 전문가적 문서처럼 보이게 답변
-   - 최신정보도 포함해서 답변
+   📑 상세 내용
+   - 주요 내용을 섹션별로 구분하여 설명
+   - 각 섹션은 소제목과 함께 제시
+   - 중요한 내용은 **강조** 표시
+   - 목록이나 단계가 필요한 경우 번호 매기기 사용
 
-3. 검색 결과가 없는 경우:
-   - "죄송합니다. 해당 주제에 대한 검색 결과를 찾을 수 없습니다."라고 명시
-   - 일반적인 정보만 제공
+   💡 추가 정보
+   - 관련된 흥미로운 사실이나 통계
+   - 실제 사례나 예시 포함
 
-4. 답변 구조:
-   - 개요
-   - 주요 내용
-   - 출처 정보
+   🔍 출처 및 참고
+   - 검색 결과 출처 명시
+   - 관련 링크나 참고자료 제시
+
+2. 형식 가이드:
+   - 각 섹션 사이에 빈 줄 추가하여 가독성 확보
+   - 긴 문단은 피하고 2-3문장으로 분리
+   - 중요한 수치나 날짜는 굵게 표시
+   - 적절한 이모지로 섹션 구분
+   - 표나 목록 활용하여 정보 구조화
+
+3. 맥락 관리:
+   - 이전 대화 내용 참조 시 "이전 대화에서 언급된..."
+   - 새로운 정보 추가 시 "추가 정보로는..."
+   - 관련 후속 질문 2-3개 제안
+
+4. 검색 결과 활용:
+   - 검색 결과와 이전 대화 내용을 자연스럽게 통합
+   - 최신 정보 우선 활용
+   - 출처 명확히 표시
+
+5. 전문성 유지:
+   - 공식적이고 전문적인 어조 사용
+   - 정확한 용어와 설명 제공
+   - 불확실한 정보는 "~로 알려져 있습니다" 형식 사용
 """
 
 # Google API 연결 테스트
@@ -144,26 +165,35 @@ def test_google_api():
 # 시작할 때 API 테스트 실행
 print(test_google_api())
 
-# Google 검색 함수 수정
-def google_search(query, num_results=5):
+# 대화 컨텍스트 관리 함수 추가
+def get_conversation_context(messages, current_query):
+    # 최근 5개의 대화만 컨텍스트로 사용
+    recent_messages = messages[-5:]
+    context = []
+    
+    for msg in recent_messages:
+        if msg["role"] == "user":
+            context.append(f"사용자: {msg['content']}")
+        elif msg["role"] == "assistant":
+            context.append(f"AI: {msg['content']}")
+    
+    return "\n".join(context)
+
+# 검색 함수 수정
+def google_search(query, context=""):
     try:
-        print(f"검색 시작: {query}")  # 디버깅
+        # 컨텍스트에서 키워드 추출
+        context_keywords = set(re.findall(r'[가-힣]+', context))
+        query_keywords = set(re.findall(r'[가-힣]+', query))
         
-        # 검색 쿼리 전처리
-        search_query = query.replace('"', '').replace('?', '').replace('!', '')
+        # 컨텍스트 키워드 중 현재 쿼리와 관련된 것만 선택
+        relevant_keywords = context_keywords.intersection(query_keywords)
         
-        # 한글 키워드 추출
-        keywords = re.findall(r'[가-힣]+', search_query)
+        # 검색 쿼리 확장
+        search_query = f"{query} {' '.join(relevant_keywords)}"
+        search_query = search_query.replace('"', '').replace('?', '').replace('!', '')
         
-        # 불용어 제거
-        stop_words = ["은", "는", "이", "가", "을", "를", "에", "의", "으로", "로", "도", "만", "것"]
-        keywords = [word for word in keywords if word not in stop_words]
-        
-        # 최종 검색어 구성
-        if "누구" in search_query or "어떤" in search_query:
-            search_query = " ".join(keywords[:2])  # 주요 키워드 2개만 사용
-        
-        print(f"최종 검색 쿼리: {search_query}")  # 디버깅
+        print(f"확장된 검색 쿼리: {search_query}")  # 디버깅
         
         service = build("customsearch", "v1", developerKey=st.secrets["google_api_key"])
         
@@ -171,7 +201,7 @@ def google_search(query, num_results=5):
             result = service.cse().list(
                 q=search_query,
                 cx=st.secrets["google_cse_id"],
-                num=num_results,
+                num=5,
                 lr='lang_ko',
                 gl='kr',
                 safe='off'  # 안전 검색 해제
