@@ -1,6 +1,7 @@
 ﻿import streamlit as st
 from openai import OpenAI
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 import os
 import json  # 디버깅용 추가
 
@@ -181,11 +182,16 @@ SYSTEM_PROMPT = """당신은 친근하고 전문적인 AI 어시스턴트입니�
 def test_google_api():
     try:
         service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
+        test_result = service.cse().list(
+            q="test",
+            cx=st.secrets["GOOGLE_CSE_ID"],
+            num=1
+        ).execute()
         return "Google API 연결 성공"
     except Exception as e:
         return f"Google API 연결 실패: {str(e)}"
 
-# 시작할 때 API 테스트
+# 시작할 때 API 테스트 실행
 print(test_google_api())
 
 # Google 검색 함수 수정
