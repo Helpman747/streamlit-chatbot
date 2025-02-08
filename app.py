@@ -19,22 +19,33 @@ st.set_page_config(
 # CSS 스타일 수정
 st.markdown("""
 <style>
-/* 헤더 배너 스타일 */
-.stApp > header {
-    background-color: transparent !important;
+/* 전체 페이지 배경 */
+.stApp {
+    background: #f7f7f8;
 }
 
+/* 헤더 배너 스타일 */
 .banner-image {
     width: 850px;
     margin: 0 auto;
     display: block;
 }
 
-/* 채팅 컨테이너 스타일 */
+/* 전체 컨테이너 */
 .main .block-container {
-    max-width: 850px !important;  /* 배너 크기에 맞춤 */
-    padding: 0 !important;
+    max-width: 850px !important;
     margin: 0 auto !important;
+    padding: 0 !important;
+    background: white;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* 메시지 영역 */
+.messages-container {
+    padding: 2rem;
+    margin-bottom: 100px;  /* 입력창 높이만큼 여백 */
 }
 
 /* 메시지 스타일 */
@@ -54,16 +65,25 @@ st.markdown("""
     border: 1px solid #e0e0e0;
 }
 
-/* 입력창 스타일 */
+/* 입력창 영역 */
 .input-area {
-    max-width: 850px;
-    margin: 0 auto;
-    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 850px;
+    background: white;
+    border-top: 1px solid #e5e5e5;
+    padding: 1.5rem;
 }
 
-/* 사이드바 로고 제거 */
-.sidebar .sidebar-content {
-    background-image: none !important;
+/* 소스 정보 스타일 */
+.source-info {
+    font-size: 0.8em;
+    color: #666;
+    border-top: 1px solid #eee;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
 }
 </style>
 """, unsafe_allow_html=True)
