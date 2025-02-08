@@ -197,38 +197,50 @@ print(test_google_api())
 # Google 검색 함수 수정
 def google_search(query, num_results=5):
     try:
-        print(f"검색 시작: {query}")  # 디버깅 로그
+        print(f"검색 시작: {query}")
+        print(f"API 키: {st.secrets['GOOGLE_API_KEY'][:10]}...")
+        print(f"검색 엔진 ID: {st.secrets['GOOGLE_CSE_ID']}")
         
-        # API 키 확인
-        print(f"Google API Key: {st.secrets['GOOGLE_API_KEY'][:10]}...")
-        print(f"CSE ID: {st.secrets['GOOGLE_CSE_ID']}")
-        
-        search_query = f"{query} site:namu.wiki OR site:wikipedia.org OR site:korean.go.kr OR site:news.naver.com"
+        # 검색어 처리
+        search_query = query  # 사이트 제한 없이 먼저 테스트
         
         service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
-        result = service.cse().list(
-            q=search_query,
-            cx=st.secrets["GOOGLE_CSE_ID"],
-            num=num_results,
-            lr='lang_ko',
-            gl='kr',
-            sort='date:r'  # 최신 결과 우선
-        ).execute()
-
-        print(f"검색 결과 수: {len(result.get('items', []))}")  # 디버깅 로그
         
-        if "items" in result:
-            search_results = []
-            for item in result["items"]:
-                search_results.append(
-                    f"출처: {item['title']}\n"
-                    f"내용: {item['snippet']}\n"
-                    f"링크: {item['link']}"
-                )
-            return "\n\n".join(search_results)
-        return ""
+        try:
+            result = service.cse().list(
+                q=search_query,
+                cx=st.secrets["GOOGLE_CSE_ID"],
+                num=num_results,
+                lr='lang_ko',
+                gl='kr'
+            ).execute()
+            
+            print(f"API 응답: {result.keys()}")
+            print(f"검색 결과: {json.dumps(result, ensure_ascii=False, indent=2)}")
+            
+            if "items" in result:
+                search_results = []
+                for item in result["items"]:
+                    search_results.append(
+                        f"제목: {item['title']}\n"
+                        f"내용: {item['snippet']}\n"
+                        f"출처: {item['link']}"
+                    )
+                return "\n\n".join(search_results)
+            else:
+                print("검색 결과 없음")
+                return ""
+                
+        except Exception as api_error:
+            print(f"API 호출 오류: {str(api_error)}")
+            import traceback
+            print(traceback.format_exc())
+            return ""
+            
     except Exception as e:
-        print(f"검색 오류 발생: {str(e)}")  # 디버깅 로그
+        print(f"전체 오류: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
         return ""
 
 # 사이드바 설정
