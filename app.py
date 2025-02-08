@@ -191,10 +191,7 @@ print(test_google_api())
 # Google 검색 함수 수정
 def google_search(query, num_results=5):
     try:
-        print(f"검색 시도: {query}")
-        print(f"API 상태: {test_google_api()}")
-        
-        search_query = f"{query} site:namu.wiki OR site:wikipedia.org OR site:korean.go.kr"
+        search_query = f"{query} site:namu.wiki OR site:wikipedia.org OR site:korean.go.kr OR site:news.naver.com"
         
         service = build("customsearch", "v1", developerKey=st.secrets["GOOGLE_API_KEY"])
         result = service.cse().list(
@@ -202,27 +199,22 @@ def google_search(query, num_results=5):
             cx=st.secrets["GOOGLE_CSE_ID"],
             num=num_results,
             lr='lang_ko',
-            gl='kr'
+            gl='kr',
+            sort='date:r'  # 최신 결과 우선
         ).execute()
 
-        print(f"검색 응답: {json.dumps(result, ensure_ascii=False, indent=2)}")
-        
         if "items" in result:
             search_results = []
             for item in result["items"]:
-                title = item['title'].replace(query, f"**{query}**")
-                snippet = item['snippet'].replace(query, f"**{query}**")
                 search_results.append(
-                    f"📌 {title}\n"
-                    f"{snippet}\n"
-                    f"[자세히 보기]({item['link']})"
+                    f"출처: {item['title']}\n"
+                    f"내용: {item['snippet']}\n"
+                    f"링크: {item['link']}"
                 )
-            return f"## 참고 자료\n\n" + "\n\n".join(search_results)
-        else:
-            print("검색 결과 없음")
-            return ""
+            return "\n\n".join(search_results)
+        return ""
     except Exception as e:
-        print(f"검색 중 오류 발생: {str(e)}")
+        print(f"검색 오류: {str(e)}")
         return ""
 
 # 사이드바 설정
@@ -281,25 +273,28 @@ st.markdown('</div>', unsafe_allow_html=True)
 # 입력 영역
 st.markdown('<div class="input-area">', unsafe_allow_html=True)
 if prompt := st.chat_input("메시지를 입력하세요..."):
-    # 사용자 메시지 추가
     st.session_state.messages.append({"role": "user", "content": prompt})
     
-    # AI 응답 생성 및 처리
+    # 검색 결과 가져오기
     search_results = google_search(prompt)
-    print(f"검색 결과: {search_results}")  # 디버깅용
-    model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
+    
+    # 시스템 메시지 구성
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        *st.session_state.messages
+        {"role": "system", "content": SYSTEM_PROMPT}
     ]
     
+    # 검색 결과가 있으면 추가 컨텍스트 제공
     if search_results:
         messages.append({
-            "role": "system",
-            "content": search_results
+            "role": "system", 
+            "content": f"다음은 사용자의 질문과 관련된 최신 정보입니다. 이를 참고하여 답변해주세요:\n\n{search_results}"
         })
-
-    # 응답 생성
+    
+    # 대화 히스토리 추가
+    messages.extend(st.session_state.messages)
+    
+    # AI 응답 생성 및 처리
+    model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
     message_placeholder = st.empty()
     response = ""
     
