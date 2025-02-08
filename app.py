@@ -196,7 +196,7 @@ with st.sidebar:
     # 기록 초기화 버튼
     if st.button("대화 기록 초기화"):
         st.session_state.messages = []
-        st.experimental_rerun()
+        st.rerun()
 
 # 세션 상태 초기화
 if "messages" not in st.session_state:
@@ -270,7 +270,8 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
     future_date_response = handle_future_date_query(prompt)
     if future_date_response:
         st.session_state.messages.append({"role": "assistant", "content": future_date_response})
-        st.experimental_rerun()
+        st.rerun()  # st.experimental_rerun() 대신 st.rerun() 사용
+        return  # 추가된 메시지 후 반환
     
     st.session_state.messages.append({"role": "user", "content": prompt})
     
