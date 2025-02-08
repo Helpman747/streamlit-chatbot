@@ -160,6 +160,9 @@ h1 {
 </div>
 """, unsafe_allow_html=True)
 
+# 배너 이미지 추가
+st.image("images/banner.png", width=850)
+
 # OpenAI 클라이언트 초기화
 client = OpenAI(api_key=st.secrets["openai_api_key"])
 
