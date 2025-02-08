@@ -19,8 +19,8 @@ st.markdown("""
 
     /* 중앙 컨테이너 */
     .main .block-container {
-        padding: 2rem 0;
         max-width: 100%;
+        padding: 0;
     }
 
     /* 채팅 컨테이너 */
@@ -31,14 +31,21 @@ st.markdown("""
         min-height: calc(100vh - 100px);
         border-radius: 8px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 메시지 영역 */
+    .messages-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 2rem 0;
     }
 
     /* 채팅 메시지 스타일 */
     .chat-message {
         padding: 1.5rem 2rem;
         line-height: 1.6;
-        word-wrap: break-word;
-        white-space: pre-wrap;
         width: 100%;
         border-bottom: 1px solid #f0f0f0;
     }
@@ -49,26 +56,26 @@ st.markdown("""
     }
 
     /* AI 메시지 */
-    .ai-message {
+    .assistant-message {
         background: white;
     }
 
-    /* 입력창 컨테이너 */
-    .input-container {
-        position: fixed;
+    /* 입력창 영역 */
+    .input-area {
+        position: sticky;
         bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 750px;
         background: white;
         padding: 1rem;
         border-top: 1px solid #f0f0f0;
+        width: 750px;
+        margin: 0 auto;
     }
 
-    /* 입력창 스타일 */
-    .stChatInput {
-        max-width: 700px;
-        margin: 0 auto;
+    /* Streamlit 기본 요소 숨기기 */
+    .stTextInput, .stMarkdown {
+        position: static;
+        margin: 0;
+        padding: 0;
     }
 
     /* 사이드바 스타일 */
@@ -157,53 +164,49 @@ if "messages" not in st.session_state:
 # 채팅 컨테이너 시작
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
-# 메시지 표시 부분
+# 메시지 영역 시작
+st.markdown('<div class="messages-container">', unsafe_allow_html=True)
+
+# 메시지 표시
 for message in st.session_state.messages:
-    # st.chat_message() 대신 직접 div로 표시
     st.markdown(
-        f'<div class="{message["role"]}-message chat-message">{message["content"]}</div>', 
+        f'<div class="{message["role"]}-message chat-message">{message["content"]}</div>',
         unsafe_allow_html=True
     )
 
-# 채팅 컨테이너 종료
+# 메시지 영역 종료
 st.markdown('</div>', unsafe_allow_html=True)
 
-# 입력창 컨테이너
-st.markdown('<div class="input-container">', unsafe_allow_html=True)
+# 입력 영역
+st.markdown('<div class="input-area">', unsafe_allow_html=True)
 if prompt := st.chat_input("메시지를 입력하세요..."):
+    # 메시지 처리 로직
     st.session_state.messages.append({"role": "user", "content": prompt})
-    # 새 메시지도 직접 div로 표시
-    st.markdown(
-        f'<div class="user-message chat-message">{prompt}</div>', 
-        unsafe_allow_html=True
+    
+    # AI 응답 생성 및 처리
+    search_results = google_search(prompt)
+    model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        *st.session_state.messages
+    ]
+    
+    if search_results:
+        messages.append({
+            "role": "system",
+            "content": f"다음은 이 질문에 대한 최신 검색 결과입니다. 이를 참고하여 최신 정보를 포함해 답변해주세요:\n\n{search_results}"
+        })
+
+    stream = client.chat.completions.create(
+        model=model_name,
+        messages=messages,
+        stream=True,
     )
-
-    with st.chat_message("assistant"):
-        # Google 검색 수행
-        search_results = google_search(prompt)
-        
-        # AI 응답 생성
-        model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            *st.session_state.messages
-        ]
-        
-        if search_results:
-            messages.append({
-                "role": "system",
-                "content": f"다음은 이 질문에 대한 최신 검색 결과입니다. 이를 참고하여 최신 정보를 포함해 답변해주세요:\n\n{search_results}"
-            })
-
-        stream = client.chat.completions.create(
-            model=model_name,
-            messages=messages,
-            stream=True,
-        )
-        response = st.write_stream(stream)
-        st.markdown(
-            f'<div class="assistant-message chat-message">{response}</div>', 
-            unsafe_allow_html=True
-        )
+    response = st.write_stream(stream)
     st.session_state.messages.append({"role": "assistant", "content": response})
+    st.experimental_rerun()  # 새로운 메시지를 표시하기 위해 페이지 새로고침
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# 채팅 컨테이너 종료
 st.markdown('</div>', unsafe_allow_html=True)
