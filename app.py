@@ -181,14 +181,7 @@ def google_search(query, num_results=3):
 
 # 사이드바 설정
 with st.sidebar:
-    st.markdown("###  테마 설정")
-    theme = st.selectbox(
-        "색상 테마",
-        ["파랑 계열", "보라 계열", "초록 계열"],
-        key="theme"
-    )
-    
-    st.markdown("###  모델 설정")
+    st.markdown("### ⚙️ 모델 설정")
     model = st.selectbox(
         "모델 선택",
         ["GPT-4 (고성능)", "GPT-3.5 (빠른응답)"],
@@ -196,13 +189,13 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.markdown("###  대화 기록")
+    st.markdown("### 💬 대화 기록")
     
     # 대화 기록이 있는 경우 표시
     if "messages" in st.session_state and len(st.session_state.messages) > 0:
-        for idx, msg in enumerate(st.session_state.messages[-5:]):  # 최근 5개 메시지만 표시
+        for idx, msg in enumerate(st.session_state.messages[-5:]):
             if msg["role"] == "user":
-                st.markdown(f" {msg['content'][:30]}...")  # 첫 30자만 표시
+                st.markdown(f"{msg['content'][:30]}...")
     else:
         st.markdown("아직 대화 기록이 없습니다.")
     
@@ -210,14 +203,6 @@ with st.sidebar:
     if st.button("대화 기록 초기화"):
         st.session_state.messages = []
         st.experimental_rerun()
-
-    st.markdown("---")
-    st.markdown("###  정보 업데이트 알림")
-    st.markdown("""
-         현재 시점: **2025년**
-         GPT 학습 데이터: ~2022년
-         시간에 민감한 정보는 추가 확인 필요
-    """)
 
 # 세션 상태 초기화
 if "messages" not in st.session_state:
