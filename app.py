@@ -210,44 +210,42 @@ print(test_google_api())
 # Google 검색 함수 수정
 def google_search(query, num_results=5):
     try:
-        # 검색 쿼리 수정 - 최신 정보를 위한 설정 추가
+        print(f"검색 시작: {query}")  # 디버깅
+        
+        # 검색 쿼리 수정
         if "나무위키" in query.lower():
             search_query = f"site:namu.wiki {query}"
         else:
-            search_query = query  # 전체 웹 검색 허용
+            search_query = query
+            
+        print(f"최종 검색 쿼리: {search_query}")  # 디버깅
         
         service = build("customsearch", "v1", developerKey=st.secrets["google_api_key"])
         
         try:
+            print(f"API 호출 시작...")  # 디버깅
             result = service.cse().list(
                 q=search_query,
                 cx=st.secrets["google_cse_id"],
                 num=num_results,
                 lr='lang_ko',
                 gl='kr',
-                sort='date'  # 날짜순 정렬 추가
+                sort='date'
             ).execute()
             
-            print(f"API 응답: {result.keys()}")
-            print(f"검색 결과: {json.dumps(result, ensure_ascii=False, indent=2)}")
+            print(f"API 응답 전체: {json.dumps(result, ensure_ascii=False, indent=2)}")  # 디버깅
             
             if "items" in result:
                 search_results = []
                 for item in result["items"]:
-                    # 나무위키 결과인 경우 특별 처리
-                    if "namu.wiki" in item['link']:
-                        title = f"나무위키: {item['title']}"
-                    else:
-                        title = item['title']
-                        
                     search_results.append(
-                        f"제목: {title}\n"
+                        f"제목: {item['title']}\n"
                         f"내용: {item['snippet']}\n"
                         f"출처: {item['link']}"
                     )
                 return "\n\n".join(search_results)
             else:
-                print("검색 결과 없음")
+                print("검색 결과 없음 - items 키가 없음")  # 디버깅
                 return ""
                 
         except Exception as api_error:
