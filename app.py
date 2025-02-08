@@ -212,12 +212,17 @@ def google_search(query, num_results=5):
     try:
         print(f"검색 시작: {query}")  # 디버깅
         
-        # 검색 쿼리 수정
-        if "나무위키" in query.lower():
-            search_query = f"site:namu.wiki {query}"
-        else:
-            search_query = query
-            
+        # 검색 쿼리 수정 - 따옴표 제거 및 키워드 추출
+        search_query = query.replace('"', '').replace('?', '').replace('!', '')
+        
+        # 핵심 키워드 추출 (예: "배그나는 어떤 방송을 하는 사람이야?" -> "배그나 방송")
+        if "누구" in search_query or "어떤" in search_query:
+            keywords = []
+            for word in search_query.split():
+                if not any(stop in word for stop in ["은", "는", "이", "가", "을", "를", "에", "의"]):
+                    keywords.append(word)
+            search_query = " ".join(keywords[:3])  # 주요 키워드 3개만 사용
+        
         print(f"최종 검색 쿼리: {search_query}")  # 디버깅
         
         service = build("customsearch", "v1", developerKey=st.secrets["google_api_key"])
@@ -229,8 +234,7 @@ def google_search(query, num_results=5):
                 cx=st.secrets["google_cse_id"],
                 num=num_results,
                 lr='lang_ko',
-                gl='kr',
-                sort='date'
+                gl='kr'
             ).execute()
             
             print(f"API 응답 전체: {json.dumps(result, ensure_ascii=False, indent=2)}")  # 디버깅
