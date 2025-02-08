@@ -243,7 +243,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = [
         {
             "role": "assistant", 
-            "content": "안녕하세요! 무엇을 도와드릴까요?"
+            "content": "이 챗봇은 수니콘 미션을 위해 제작된 챗봇입니다. 무엇이든 물어보세요! 😊"
         }
     ]
 
