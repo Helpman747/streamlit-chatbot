@@ -5,14 +5,19 @@ from googleapiclient.errors import HttpError
 import os
 import json  # 디버깅용 추가
 import re
+import base64
 
 # app.py 맨 위에 추가
 print("Available secrets:", st.secrets)
 
 # 페이지 설정
+def get_base64_encoded_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
 st.set_page_config(
     page_title="25th 3rd Soonicon ChatGPT",
-    page_icon="🤖",
+    page_icon=get_base64_encoded_image("logo.gif"),
     layout="centered"  # wide에서 centered로 변경
 )
 
