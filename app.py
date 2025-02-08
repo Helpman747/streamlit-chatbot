@@ -25,7 +25,7 @@ st.markdown("""
 
     /* 채팅 컨테이너 */
     .chat-container {
-        max-width: 750px;
+        max-width: 800px;
         margin: 0 auto;
         background: white;
         min-height: calc(100vh - 100px);
@@ -67,7 +67,13 @@ st.markdown("""
         background: white;
         padding: 1rem;
         border-top: 1px solid #f0f0f0;
-        width: 750px;
+        width: 800px;
+        margin: 0 auto;
+    }
+
+    /* 입력창 스타일 */
+    .stChatInput {
+        max-width: 800px !important;
         margin: 0 auto;
     }
 
