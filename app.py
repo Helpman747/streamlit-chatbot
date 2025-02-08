@@ -270,55 +270,54 @@ if prompt := st.chat_input("메시지를 입력하세요..."):
     future_date_response = handle_future_date_query(prompt)
     if future_date_response:
         st.session_state.messages.append({"role": "assistant", "content": future_date_response})
-        st.rerun()  # st.experimental_rerun() 대신 st.rerun() 사용
-        continue  # 추가된 메시지 후 다음 반복으로 넘어감
-    
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    
-    # 검색 결과 가져오기
-    search_results = google_search(prompt)
-    print(f"검색 결과: {search_results}")  # 디버깅용
-    
-    # 시스템 메시지 구성
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT}
-    ]
-    
-    # 검색 결과가 있으면 추가 컨텍스트 제공
-    if search_results:
-        context_message = f"""다음은 사용자의 질문과 관련된 최신 정보입니다:
+        st.rerun()  # 앱을 다시 실행하여 메시지를 표시
+    else:
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        # 검색 결과 가져오기
+        search_results = google_search(prompt)
+        print(f"검색 결과: {search_results}")  # 디버깅용
+        
+        # 시스템 메시지 구성
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT}
+        ]
+        
+        # 검색 결과가 있으면 추가 컨텍스트 제공
+        if search_results:
+            context_message = f"""다음은 사용자의 질문과 관련된 최신 정보입니다:
 
 {search_results}
 
 위 정보를 참고하여 최신 정보를 포함해 답변해주세요."""
+            
+            messages.append({
+                "role": "system",
+                "content": context_message
+            })
         
-        messages.append({
-            "role": "system",
-            "content": context_message
-        })
-    
-    # 대화 히스토리 추가
-    messages.extend(st.session_state.messages)
-    
-    # AI 응답 생성 및 처리
-    model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
-    message_placeholder = st.empty()
-    response = ""
-    
-    for chunk in client.chat.completions.create(
-        model=model_name,
-        messages=messages,
-        stream=True,
-    ):
-        if chunk.choices[0].delta.content is not None:
-            response += chunk.choices[0].delta.content
-            message_placeholder.markdown(
-                format_message(response, "assistant"),
-                unsafe_allow_html=True
-            )
+        # 대화 히스토리 추가
+        messages.extend(st.session_state.messages)
+        
+        # AI 응답 생성 및 처리
+        model_name = "gpt-4" if "GPT-4" in model else "gpt-3.5-turbo"
+        message_placeholder = st.empty()
+        response = ""
+        
+        for chunk in client.chat.completions.create(
+            model=model_name,
+            messages=messages,
+            stream=True,
+        ):
+            if chunk.choices[0].delta.content is not None:
+                response += chunk.choices[0].delta.content
+                message_placeholder.markdown(
+                    format_message(response, "assistant"),
+                    unsafe_allow_html=True
+                )
 
-    # 응답 저장
-    st.session_state.messages.append({"role": "assistant", "content": response})
+        # 응답 저장
+        st.session_state.messages.append({"role": "assistant", "content": response})
 
 st.markdown('</div>', unsafe_allow_html=True)
 
