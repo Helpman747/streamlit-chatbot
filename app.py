@@ -110,6 +110,39 @@ def get_conversation_context(messages, current_query):
     
     return "\n".join(context)
 
+# format_message 함수 수정
+def format_message(content, role):
+    try:
+        # 일반 메시지인 경우 바로 반환
+        if "**" not in content or "[출처]" not in content:
+            return f'<div class="{role}-message chat-message">{content}</div>'
+        
+        # 검색 결과를 포함한 메시지 포맷팅
+        parts = content.split("\n\n")
+        formatted_content = []
+        
+        for part in parts:
+            try:
+                if part.startswith("**"):
+                    lines = part.split("\n")
+                    # 최소한의 정보만 있어도 처리 가능하도록 수정
+                    title = lines[0].replace("**", "") if lines else ""
+                    snippet = lines[1] if len(lines) > 1 else ""
+                    formatted_content.append(f"### {title}\n{snippet}")
+                else:
+                    formatted_content.append(part)
+            except Exception as e:
+                print(f"부분 처리 오류: {str(e)}")
+                formatted_content.append(part)
+        
+        return f"""<div class="{role}-message chat-message">
+{"\n\n".join(formatted_content)}
+</div>"""
+    except Exception as e:
+        print(f"메시지 포맷팅 오류: {str(e)}")
+        # 오류 발생 시 원본 내용 그대로 반환
+        return f'<div class="{role}-message chat-message">{content}</div>'
+
 # 검색 함수 수정
 def google_search(query, context=""):
     try:
@@ -129,32 +162,25 @@ def google_search(query, context=""):
         
         if "items" in result:
             search_results = []
-            seen_sources = set()  # 중복 출처 방지
             
             for item in result["items"]:
-                source = item['link']
-                if source in seen_sources:
-                    continue  # 중복 출처 건너뛰기
-                seen_sources.add(source)
-                
-                # 핵심 내용 추출
-                title = item['title']
-                snippet = item['snippet']
-                
-                # 불필요한 정보 제거
-                snippet = re.sub(r'\.\.\.', '', snippet)  # ... 제거
-                snippet = re.sub(r'\s+', ' ', snippet).strip()  # 공백 정리
-                
-                # 검색 결과 형식 검증
-                if title and snippet and source:
-                    search_results.append(f"**{title}**\n{snippet}\n[출처]({source})")
-                else:
-                    # 형식이 맞지 않는 경우, 기본 형식으로 표시
-                    search_results.append(f"**{title}**\n{snippet}\n[출처]({source})")
+                try:
+                    title = item.get('title', '')
+                    snippet = item.get('snippet', '')
+                    
+                    # 불필요한 정보 제거
+                    snippet = re.sub(r'\.\.\.', '', snippet)  # ... 제거
+                    snippet = re.sub(r'\s+', ' ', snippet).strip()  # 공백 정리
+                    
+                    # 검색 결과 추가 (출처 정보 제외)
+                    if title and snippet:
+                        search_results.append(f"**{title}**\n{snippet}")
+                except Exception as e:
+                    print(f"검색 결과 처리 오류: {str(e)}")
+                    continue
             
             return "\n\n".join(search_results)
-        else:
-            return ""
+        return ""
     except Exception as e:
         print(f"검색 오류: {str(e)}")
         return ""
@@ -228,32 +254,6 @@ st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 st.markdown('<div class="messages-container">', unsafe_allow_html=True)
 
 # 메시지 표시 함수 추가
-def format_message(content, role):
-    if "**" in content and "[출처]" in content:
-        # 검색 결과를 포함한 메시지 포맷팅
-        parts = content.split("\n\n")
-        formatted_content = []
-        
-        for part in parts:
-            if part.startswith("**"):
-                lines = part.split("\n")
-                if len(lines) >= 3:  # lines 리스트의 길이 확인
-                    title = lines[0].replace("**", "")
-                    snippet = lines[1]
-                    source = lines[2].replace("[출처]", "🔗 출처:")
-                    
-                    formatted_content.append(f"### {title}\n{snippet}\n{source}")
-                else:
-                    # 형식이 맞지 않는 경우, 기본 형식으로 표시
-                    formatted_content.append(part)
-        
-        return f"""<div class="{role}-message chat-message">
-{"\n\n".join(formatted_content)}
-</div>"""
-    else:
-        return f'<div class="{role}-message chat-message">{content}</div>'
-
-# 메시지 표시 부분 수정
 for message in st.session_state.messages:
     st.markdown(
         format_message(message["content"], message["role"]),
